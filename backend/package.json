@@ -1,0 +1,11 @@
+{
+	"name": "backend",
+	"version": "1.0.0",
+	"description": "Backend for WeMeetOffline",
+	"author": "Keshav Garg",
+	"type": "commonjs",
+	"main": "index.js",
+	"scripts": {
+		"test": "npm start"
+	}
+}
