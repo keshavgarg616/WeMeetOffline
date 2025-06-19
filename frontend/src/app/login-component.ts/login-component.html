@@ -1,1 +1,20 @@
-<p>login-component.ts works!</p>
+<div style="text-align: center; margin-top: 40px;">
+    <h1>Login</h1>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()"
+        style="display: inline-block; width: 100%; max-width: 600px; text-align: left;">
+        <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" formControlName="email" placeholder="Enter your email">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Password</mat-label>
+            <input matInput type="password" formControlName="password" placeholder="Enter your password">
+        </mat-form-field>
+
+        <button matButton="filled" color="primary" type="submit" [attr.disabled]="loginForm.invalid ? '' : null">
+            Login
+        </button>
+        <a href="/signup" style="margin-left: 280px;">Don't have an account? Sign Up </a>
+    </form>
+</div>

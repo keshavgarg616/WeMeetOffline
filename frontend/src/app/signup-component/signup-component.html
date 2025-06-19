@@ -1,1 +1,26 @@
-<p>signup-component works!</p>
+<div style="text-align: center; margin-top: 40px;">
+    <h1>Sign Up</h1>
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()"
+        style="display: inline-block; width: 100%; max-width: 600px; text-align: left;">
+        <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" formControlName="email" placeholder="Enter your email">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Password</mat-label>
+            <input matInput type="password" formControlName="password" placeholder="Enter your password">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Confirm password</mat-label>
+            <input matInput type="password" formControlName="confirmPassword" placeholder="Confirm your password">
+        </mat-form-field>
+
+        <button matButton="filled" color="primary" type="submit"
+            [disabled]="signupForm.invalid || signupForm.value.password !== signupForm.value.confirmPassword">
+            Sign Up
+        </button>
+        <a href="/login" style="margin-left: 260px;">Already have an account? Login </a>
+    </form>
+</div>

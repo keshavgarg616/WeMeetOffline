@@ -1,4 +1,6 @@
+frontend/.angular
 backend/.env
 frontend/src/environments
 backend/node_modules
 frontend/node_modules
+schema_summary.json
