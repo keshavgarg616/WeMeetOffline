@@ -1,6 +1,6 @@
-import { Component } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { ChangeDetectorRef, Component, inject } from "@angular/core";
 import {
-	Form,
 	FormControl,
 	FormGroup,
 	FormsModule,
@@ -10,43 +10,72 @@ import {
 import { MatButtonModule } from "@angular/material/button";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
+import { ApiService } from "../api.service";
+import { Router } from "@angular/router";
+import {
+	createPasswordMatchValidator,
+	createPasswordValidator,
+} from "../passwordStrengthValidator";
 
 @Component({
-	selector: "app-signup-component",
+	selector: "signup-route",
+	standalone: true,
+	templateUrl: "./signup-component.html",
 	imports: [
+		CommonModule,
 		FormsModule,
 		ReactiveFormsModule,
 		MatFormFieldModule,
-		MatInputModule,
 		MatButtonModule,
+		MatInputModule,
 	],
-	templateUrl: "./signup-component.html",
 })
-export class SignupComponent {
-	signupForm: FormGroup;
+export class SignUpComponent {
+	router: Router;
+	invalidInfo: Array<string> = [];
 
-	constructor() {
-		this.signupForm = new FormGroup({
-			email: new FormControl("", [Validators.required, Validators.email]),
-			password: new FormControl("", [
-				Validators.required,
-				Validators.minLength(6),
-			]),
-			confirmPassword: new FormControl("", [
-				Validators.required,
-				Validators.minLength(6),
-			]),
-		});
+	constructor(
+		private apiService: ApiService,
+		private cdr: ChangeDetectorRef
+	) {
+		this.router = inject(Router);
+		if (localStorage.getItem("token")) {
+			this.router.navigate(["/login"]);
+		}
 	}
 
-	onSubmit() {
-		if (
-			this.signupForm.value.password ===
-			this.signupForm.value.confirmPassword
-		) {
-			const { email, password, confirmPassword } = this.signupForm.value;
-			console.log("Email:", email);
-			console.log("Password:", password);
+	signUpForm = new FormGroup(
+		{
+			name: new FormControl("", [Validators.required]),
+			email: new FormControl("", [Validators.required, Validators.email]),
+			pswd: new FormControl("", {
+				validators: [Validators.required, createPasswordValidator()],
+				updateOn: "change",
+			}),
+			confirmPswd: new FormControl("", [Validators.required]),
+		},
+		{ validators: createPasswordMatchValidator(), updateOn: "change" }
+	);
+
+	signUp() {
+		if (this.signUpForm.valid) {
+			this.invalidInfo = [];
+			const { name, email, pswd } = this.signUpForm.value;
+			let password = pswd?.trim().toString();
+			this.apiService
+				.signup(name || "", email || "", password || "")
+				.subscribe({
+					next: (response) => {
+						this.router.navigate(["/login"]);
+						this.invalidInfo = [];
+					},
+					error: (error) => {
+						if (error.error.error.includes("User already exists")) {
+							this.invalidInfo.push("Email already exists");
+						}
+						this.cdr.detectChanges();
+					},
+				});
 		}
 	}
 }

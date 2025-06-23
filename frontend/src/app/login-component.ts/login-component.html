@@ -1,20 +1,62 @@
 <div style="text-align: center; margin-top: 40px;">
-    <h1>Login</h1>
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()"
-        style="display: inline-block; width: 100%; max-width: 600px; text-align: left;">
-        <mat-form-field appearance="fill" style="width: 100%;">
+    <h2>Login</h2>
+
+    <!-- Error Box -->
+    <div *ngIf="invalidInfo.length > 0">
+        <ul style="
+            list-style-type: none;
+            color: red;
+            font-weight: bold;
+            background-color: #f8d7da;
+            border-radius: 5px;
+            padding: 10px;
+            width: 800px;
+            margin: 0 auto;
+            text-align: center;">
+            <li *ngFor="let message of invalidInfo">{{ message }}</li>
+        </ul>
+        <br>
+    </div>
+
+    <!-- Login Form -->
+    <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm)">
+        <!-- Email Field -->
+        <mat-form-field appearance="fill" class="w-full" style="width: 600px;">
             <mat-label>Email</mat-label>
-            <input matInput type="email" formControlName="email" placeholder="Enter your email">
+            <input matInput type="email" id="email" name="email" [(ngModel)]="email" required email
+                #emailInput="ngModel" />
         </mat-form-field>
+        <div *ngIf="emailInput.invalid && (emailInput.touched || loginForm.submitted)" class="error"
+            style="color: red;">
+            Valid email is required.
+        </div>
+        <br>
 
-        <mat-form-field appearance="fill" style="width: 100%;">
+        <!-- Password Field -->
+        <mat-form-field appearance="fill" class="w-full" style="width: 600px;">
             <mat-label>Password</mat-label>
-            <input matInput type="password" formControlName="password" placeholder="Enter your password">
+            <input matInput type="password" id="password" name="password" [(ngModel)]="password" required minlength="6"
+                #passwordInput="ngModel" />
         </mat-form-field>
+        <div *ngIf="passwordInput.invalid && (passwordInput.touched || loginForm.submitted)" class="error"
+            style="color: red;">
+            Password must be at least 6 characters.
+        </div>
+        <br>
 
-        <button matButton="filled" color="primary" type="submit" [attr.disabled]="loginForm.invalid ? '' : null">
-            Login
-        </button>
-        <a href="/signup" style="margin-left: 280px;">Don't have an account? Sign Up </a>
+        <!-- Submit Button -->
+        <button mat-raised-button type="submit" [disabled]="loginForm.invalid">Submit</button>
+        <br><br>
+
+        <!-- Links -->
+        <a href="/signup" style="color: rgb(144, 144, 236); width: 200px; margin-left: 100px; margin-right: 100px;"
+            mat-raised-button>
+            Don't have an account? Sign Up
+        </a>
+
+        <a href="/forgot-password"
+            style="color: rgb(144, 144, 236); width: 200px; margin-left: 100px; margin-right: 100px;" mat-raised-button>
+            Forgot Password?
+        </a>
     </form>
 </div>

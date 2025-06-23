@@ -1,0 +1,24 @@
+<div style="float: right; margin-right: 10px; margin-top: 10px;">
+    <a href="/create-event">
+        <button matButton color="primary" style="font-size: xx-large; width: 50px; height: 50px">+</button>
+    </a>
+    <a href="/logout">
+        <br>
+        <button matButton color="warn" style="color: red; width: 50px; height: auto; font-size: 1.3em;">Logout</button>
+    </a>
+</div>
+
+<div style="text-align: center; width: 80%; margin: auto;">
+    <h1 style="font-weight: bold; font-size: 2.5em;">Events</h1><br>
+    <div style="align-items: right; display:flex; flex-wrap: wrap; gap: 16px; justify-content: left;">
+        <mat-card *ngFor="let item of events" style="width: calc(25% - 16px); min-width: 200px; max-width: 400px;">
+            <mat-card-content>
+                <img src="{{ item.picture }}" alt="Event Banner" style="width: 100%; height: auto; color: tomato;">
+            </mat-card-content>
+            <mat-card-title style="font-size: 1.1em; font-weight: bold;">{{ item.title }}<div
+                    style="font-size: 0.8em; font-weight: normal;">
+                    {{
+                    item.description }}</div></mat-card-title>
+        </mat-card>
+    </div>
+</div>

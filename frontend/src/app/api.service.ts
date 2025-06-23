@@ -2,7 +2,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Observable } from "rxjs";
-import { Environment } from "../environments/environment";
+import { environment } from "../environments/environment";
 
 @Injectable({
 	providedIn: "root",
@@ -10,8 +10,8 @@ import { Environment } from "../environments/environment";
 export class ApiService {
 	private apiUrl: string;
 
-	constructor(private http: HttpClient, private environment: Environment) {
-		this.apiUrl = this.environment.BACKEND_URL;
+	constructor(private http: HttpClient) {
+		this.apiUrl = environment.BACKEND_URL;
 	}
 
 	private getAuthHeaders() {
@@ -23,8 +23,7 @@ export class ApiService {
 		};
 	}
 
-	// code here
-	signup(email: string, password: string, name: string): Observable<any> {
+	signup(name: string, email: string, password: string): Observable<any> {
 		const body = { name, email, password };
 		return this.http.post(`${this.apiUrl}signup`, body);
 	}
@@ -37,7 +36,7 @@ export class ApiService {
 	verifyEmail(authCode: string): Observable<any> {
 		const body = { authCode };
 		return this.http.post(
-			`${this.apiUrl}verify-email`,
+			`${this.apiUrl}verify-email-code`,
 			body,
 			this.getAuthHeaders()
 		);
@@ -78,7 +77,8 @@ export class ApiService {
 		address: string,
 		isVirtual: boolean,
 		tags: string[],
-		timezone: string
+		timezone: string,
+		imgUrl: string
 	): Observable<any> {
 		const body = {
 			title,
@@ -89,6 +89,7 @@ export class ApiService {
 			isVirtual,
 			tags,
 			timezone,
+			imgUrl,
 		};
 		return this.http.post(
 			`${this.apiUrl}add-event`,

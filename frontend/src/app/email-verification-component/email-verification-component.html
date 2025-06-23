@@ -1,0 +1,31 @@
+<div *ngIf="emailVerified" style="
+        color: greenyellow;
+        font-weight: bold;
+        background-color: green;
+        border-radius: 5px;
+        padding: 10px;
+        width: 800px;
+        margin: 0 auto;
+        text-align: center;
+    ">
+    Email verified successfully!
+    <br>
+</div>
+<div *ngIf="invalidInfo.length > 0">
+    <ul style="
+    list-style-type: none;
+    color: red;
+    font-weight: bold;
+    background-color: #f8d7da;
+    border-radius: 5px;
+    padding: 10px;
+    width: 800px;
+    margin: 0 auto;
+    text-align: center;
+">
+        <div *ngFor="let message of invalidInfo">
+            <li>{{ message }}</li>
+        </div>
+    </ul>
+    <br>
+</div>

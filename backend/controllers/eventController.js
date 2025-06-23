@@ -10,8 +10,11 @@ export const addEvent = async (req, res) => {
 		address,
 		tags,
 		timezone,
+		imgUrl,
 	} = req.body;
+
 	const userId = req.userId;
+
 	try {
 		const existingEvent = await Event.findOne({ title });
 		if (existingEvent) {
@@ -19,6 +22,7 @@ export const addEvent = async (req, res) => {
 				.status(400)
 				.json({ error: "Event with this title already exists" });
 		}
+
 		const newEvent = new Event({
 			title,
 			description,
@@ -30,6 +34,7 @@ export const addEvent = async (req, res) => {
 			organizerId: userId,
 			timezone,
 			attendeeIds: [],
+			picture: imgUrl,
 		});
 
 		await newEvent.save();

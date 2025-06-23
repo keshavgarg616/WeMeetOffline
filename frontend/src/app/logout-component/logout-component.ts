@@ -5,4 +5,9 @@ import { Component } from "@angular/core";
 	imports: [],
 	template: `Logging out...`,
 })
-export class LogoutComponent {}
+export class LogoutComponent {
+	constructor() {
+		localStorage.removeItem("token");
+		window.location.href = "/login";
+	}
+}

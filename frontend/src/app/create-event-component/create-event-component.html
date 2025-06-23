@@ -1,0 +1,84 @@
+<div style="position: absolute; top: 15px; right: 15px;">
+    <a href="/home">
+        <br>
+        <button matButton color="warn" style="color: red; font-size: 1.1em;">Go Back</button>
+    </a>
+</div>
+<div style="text-align: center; align-items: center; margin: auto">
+    <h1>Create Event</h1>
+    <form [formGroup]="eventForm" (ngSubmit)="onSubmit()">
+        <div style="width: fit-content; margin: auto;">
+            <mat-form-field appearance="fill" style="width: 600px;">
+                <mat-label>Event Title</mat-label>
+                <input matInput formControlName="title" required>
+            </mat-form-field>
+            <br>
+            <mat-form-field appearance="fill" style="width: 600px;">
+                <mat-label>Description</mat-label>
+                <textarea matInput formControlName="description" required></textarea>
+            </mat-form-field>
+            <br>
+            <mat-form-field appearance="fill" style="width: 600px;">
+                <mat-label>Address</mat-label>
+                <textarea matInput formControlName="address" required></textarea>
+            </mat-form-field>
+            <br>
+            <mat-form-field appearance="fill" style="width: 600px;">
+                <mat-label>Tags</mat-label>
+                <input matInput formControlName="tags" placeholder="Tag 1, Tag 2, Tag 3" />
+            </mat-form-field>
+            <br>
+
+            <div style="width: 100%; display: flex; align-items: center;">
+                <mat-form-field style="margin-right: 40px;">
+                    <mat-label>Start date</mat-label>
+                    <input matInput [matDatepicker]="datepicker" formControlName="startDate"
+                        [(ngModel)]="startDateAndTime">
+                    <mat-datepicker #datepicker />
+                    <mat-datepicker-toggle [for]="datepicker" matSuffix />
+                </mat-form-field>
+
+                <mat-form-field>
+                    <mat-label>Start time</mat-label>
+                    <input matInput [matTimepicker]="timepicker" formControlName="startTime"
+                        [(ngModel)]="startDateAndTime">
+                    <mat-timepicker #timepicker />
+                    <mat-timepicker-toggle [for]="timepicker" matSuffix />
+                </mat-form-field>
+            </div>
+
+            <div style="width: 100%; display: flex; align-items: center;">
+                <mat-form-field style="margin-right: 40px;">
+                    <mat-label>End date</mat-label>
+                    <input matInput [matDatepicker]="datepicker_" formControlName="endDate"
+                        [(ngModel)]="endDateAndTime">
+                    <mat-datepicker #datepicker_ />
+                    <mat-datepicker-toggle [for]="datepicker_" matSuffix />
+                </mat-form-field>
+
+                <mat-form-field>
+                    <mat-label>End time</mat-label>
+                    <input matInput [matTimepicker]="timepicker_" formControlName="endTime"
+                        [(ngModel)]="endDateAndTime">
+                    <mat-timepicker #timepicker_ />
+                    <mat-timepicker-toggle [for]="timepicker_" matSuffix />
+                </mat-form-field>
+            </div>
+
+            <div style="width: 100%; text-align: left;">
+                <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                    <span>Virtual Event</span>
+                    <mat-slide-toggle formControlName="isVirtual"></mat-slide-toggle>
+                </div>
+                <br>
+                <ng-picker-overlay [apikey]="FILESTACK_API_KEY" (uploadSuccess)="onUploadSuccess($event)">
+                    <button matButton
+                        style="margin-left: -12px; margin-top: -10px; font-size: 1em; color: greenyellow;">Choose Event
+                        Banner</button>
+                </ng-picker-overlay>
+            </div>
+        </div>
+        <br>
+        <button mat-raised-button color="primary" type="submit" [disabled]="eventForm.invalid">Create Event</button>
+    </form>
+</div>
