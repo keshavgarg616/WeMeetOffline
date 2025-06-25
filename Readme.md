@@ -11,8 +11,6 @@ WeMeetOffline is a full-stack web application built with **Angular** and **Node.
 -   **Email Services**: Nodemailer with SMTP
 -   **File Upload**: Filestack
 
----
-
 ## 🚀 Features
 
 -   🔐 User authentication (signup/login/reset/verify)
@@ -21,8 +19,6 @@ WeMeetOffline is a full-stack web application built with **Angular** and **Node.
 -   🧑‍🤝‍🧑 Participant visibility for registered users
 -   📧 Email verification and password reset
 -   🌍 Support for both virtual and physical events
-
----
 
 ## 🔧 Project Structure
 
@@ -42,8 +38,6 @@ WeMeetOffline/
 │       │   └── environment.ts ← Frontend API key and backend URL config
 │       └── app/              ← All Angular components and services
 ```
-
----
 
 ## ⚙️ Backend Configuration (.env)
 
@@ -74,8 +68,6 @@ EMAIL_SMTP_PORT=587
 FRONTEND_URL=http://localhost:4200
 ```
 
----
-
 ## 🌐 Frontend Configuration (environment.ts)
 
 In `frontend/src/environments/environment.ts`, configure your environment like so:
@@ -86,8 +78,6 @@ export const environment = {
 	FILESTACK_API_KEY: "your-filestack-api-key",
 };
 ```
-
----
 
 ## 🧪 Setup Instructions
 
@@ -111,20 +101,14 @@ npm start
 
 Visit: `http://localhost:4200`
 
----
-
 ## 📸 Screenshots
 
 TO_DO
-
----
 
 ## TO DO
 
 Implement edit event page at /edit-event  
 Deploy online
-
----
 
 ## 📬 Contact
 
