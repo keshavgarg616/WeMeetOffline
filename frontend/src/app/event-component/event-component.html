@@ -68,8 +68,7 @@
                 margin-right: 6px;
                 font-size: 0.85em;
                 white-space: nowrap;
-            ">
-            {{ tag }}
+            ">{{ tag }}
         </span>
         }
         <div style="position: absolute; top: 20px; right: 20px;">
@@ -78,8 +77,7 @@
             <button mat-flat-button color="primary" (click)="registerForEvent()">
                 Join Event
             </button>
-            }
-            @if(isRegistered) {
+            } @else {
             <button mat-flat-button color="primary" (click)="leaveEvent()">
                 Leave Event
             </button>
@@ -117,18 +115,23 @@
                 padding: 15px;
                 border-radius: 20px;
                 box-sizing: border-box;">
-                @if (event?.attendeeIds?.length === 0) {
+                @if (canViewAttendees) {
+                @if (attendeeIds.length === 0) {
                 <span style="font-weight: bold; font-size: 1.15em;">
                     No participants yet.
                 </span>
-                }
-                @if (event?.attendeeIds?.length !== 0) {
+                } @else {
                 <span style="font-weight: bold; font-size: 1.15em;">Participants:</span>
-                @for (attendee of event?.attendeeIds; track attendee.name) {
+                @for (attendee of attendeeIds; track attendee.pfp) {
                 <div style="margin-top: 5px;">
                     {{ attendee.name }}
                 </div>
                 }
+                }
+                } @else {
+                <span style="font-size: 1.15em; color: #888;">
+                    Register to view participants.
+                </span>
                 }
             </div>
         </div>
@@ -144,12 +147,15 @@
             <span style="font-weight: bold; font-size: 1.15em;">Event Type:</span><br>
             {{event?.isVirtual ? "Virtual" : "In-Person"}}
             <br><br>
-            @if (!event?.isVirtual) {
-            <span style="font-weight: bold; font-size: 1.15em;">Location:</span><br>
-            {{event?.address}}
-            <br>
-            <br>
+            <span style="font-weight: bold; font-size: 1.15em;">{{event?.isVirtual ? 'Meeting Link' :
+                'Location'}}:</span><br>
+            @if (isRegistered || isOrganizer) {
+            {{address}}
+            } @else {
+            <span style="color: #888;">Register to view this field.</span>
             }
+            <br>
+            <br>
             <span style="font-weight: bold; font-size: 1.15em;">Date & Time:</span><br>
 
             {{ this.event?.beginsAt | date }}, {{ this.event?.beginsAt | date: 'h:mm a' }}

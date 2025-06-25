@@ -48,11 +48,11 @@ export class CreateEventComponent {
 	eventForm: FormGroup = new FormGroup({
 		title: new FormControl("", Validators.required),
 		description: new FormControl("", Validators.required),
-		address: new FormControl(""),
+		address: new FormControl("", Validators.required),
 		tags: new FormControl(""),
 		isVirtual: new FormControl(true),
 		startDate: new FormControl("", Validators.required),
-		endDate: new FormControl(""),
+		endDate: new FormControl("", Validators.required),
 		startTime: new FormControl("", Validators.required),
 		endTime: new FormControl("", Validators.required),
 	});

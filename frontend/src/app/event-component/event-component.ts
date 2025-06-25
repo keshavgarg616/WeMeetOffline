@@ -3,6 +3,7 @@ import { ApiService } from "../api.service";
 import { Router } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { MatButtonModule } from "@angular/material/button";
+import { firstValueFrom } from "rxjs";
 
 @Component({
 	selector: "app-event-component",
@@ -16,68 +17,62 @@ export class EventComponent {
 	title: string = "";
 	isRegistered: boolean = false;
 	isOrganizer: boolean = false;
+	attendeeIds: User[] = [];
+	address: string = "";
+	canViewAttendees: boolean = false;
+
 	constructor(
 		private apiService: ApiService,
 		private cdr: ChangeDetectorRef
 	) {
 		this.router = inject(Router);
+		this.init();
+	}
+
+	async init() {
 		const nav = this.router.getCurrentNavigation();
 		const state = nav?.extras?.state as {
 			eventTitle: string;
 		};
 		if (state === null || state === undefined) {
-			console.log("state is null/undefined");
 			this.router.navigate(["/home"]);
 			return;
 		}
 		this.title = state.eventTitle ?? "";
 		if (!this.title) {
-			console.log("title is blank");
 			this.router.navigate(["/home"]);
 			return;
 		}
-		this.apiService.getEventByTitle(this.title).subscribe({
-			next: (response) => {
-				if (response.error) {
-					console.error("Error fetching event");
-				} else {
-					this.event = response;
-					this.cdr.detectChanges();
-				}
-			},
-			error: (err) => {
-				if (err.error.error.includes("Invalid token")) {
-					this.router.navigate(["/logout"]);
-				}
-				console.error("Error fetching event: ", err);
-			},
-		});
-		this.apiService.isRegisteredForEvent(this.title).subscribe({
-			next: (response) => {
-				if (response.error) {
-					console.error("Error checking registration status");
-				} else {
-					this.isRegistered = response.isRegistered;
-					this.cdr.detectChanges();
-				}
-			},
-			error(err) {
-				console.error("Error checking registration status: ", err);
-			},
-		});
-		this.apiService.isOrganizerOfEvent(this.title).subscribe({
-			next: (response) => {
-				if (response.error) {
-					console.error("Error checking organizer status");
-				} else {
-					this.isOrganizer = response.isOrganizer;
-					this.cdr.detectChanges();
-				}
-			},
-			error(err) {
-				console.error("Error checking organizer status: ", err);
-			},
-		});
+
+		try {
+			this.event = await firstValueFrom(
+				this.apiService.getEventByTitle(this.title)
+			);
+			this.isRegistered = (
+				await firstValueFrom(
+					this.apiService.isRegisteredForEvent(this.title)
+				)
+			).isRegistered;
+			this.isOrganizer = (
+				await firstValueFrom(
+					this.apiService.isOrganizerOfEvent(this.title)
+				)
+			).isOrganizer;
+
+			if (this.isRegistered || this.isOrganizer) {
+				const res = await firstValueFrom(
+					this.apiService.getAddressAndAttendees(this.title)
+				);
+				this.address = res.address;
+				this.attendeeIds = res.attendees;
+				this.canViewAttendees = true;
+			}
+			this.cdr.detectChanges();
+		} catch (err: any) {
+			if (err.error?.error?.includes("Invalid token")) {
+				this.router.navigate(["/logout"]);
+			}
+		}
 	}
 
 	registerForEvent() {
@@ -87,7 +82,22 @@ export class EventComponent {
 					console.error("Error registering for event");
 				} else {
 					this.isRegistered = true;
-					this.cdr.detectChanges();
+					this.apiService
+						.getAddressAndAttendees(this.title)
+						.subscribe({
+							next: (response) => {
+								if (response.error) {
+									console.error(
+										"Error fetching address and attendees"
+									);
+								} else {
+									this.address = response.address;
+									this.attendeeIds = response.attendees;
+									this.canViewAttendees = true;
+									this.cdr.detectChanges();
+								}
+							},
+						});
 				}
 			},
 			error: (err) => {
@@ -106,6 +116,7 @@ export class EventComponent {
 					console.error("Error leaving event");
 				} else {
 					this.isRegistered = false;
+					this.canViewAttendees = false;
 					this.cdr.detectChanges();
 				}
 			},
@@ -126,9 +137,7 @@ export class EventComponent {
 }
 
 interface User {
-	_id: string;
 	name: string;
-	email: string;
 	pfp: string;
 }
 
@@ -139,10 +148,8 @@ interface Event {
 	beginsAt: Date;
 	endsAt: Date;
 	isVirtual: boolean;
-	address: string;
 	tags: string[];
 	organizerId: User;
-	attendeeIds: User[];
 	timezone: string;
 	picture: string;
 	__v: number;

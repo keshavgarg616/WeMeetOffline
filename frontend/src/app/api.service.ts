@@ -188,4 +188,13 @@ export class ApiService {
 			this.getAuthHeaders()
 		);
 	}
+
+	getAddressAndAttendees(title: string): Observable<any> {
+		const body = { title };
+		return this.http.post(
+			`${this.apiUrl}get-address-and-attendees`,
+			body,
+			this.getAuthHeaders()
+		);
+	}
 }

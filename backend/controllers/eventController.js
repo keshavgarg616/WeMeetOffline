@@ -48,9 +48,8 @@ export const addEvent = async (req, res) => {
 
 export const getEvents = async (req, res) => {
 	try {
-		const events = await Event.find()
-			.populate("organizerId", "name email pfp")
-			.populate("attendeeIds", "name email pfp")
+		const events = await Event.find({}, { attendeeIds: 0, address: 0 })
+			.populate("organizerId", { name: 1, pfp: 1, _id: 0 })
 			.sort({ beginsAt: 1 }); // Sort by beginning time
 		res.status(200).json(events);
 	} catch (error) {
@@ -85,9 +84,10 @@ export const getEventByTitle = async (req, res) => {
 	const { title } = req.body;
 
 	try {
-		const event = await Event.findOne({ title })
-			.populate("organizerId", "name email pfp")
-			.populate("attendeeIds", "name email pfp");
+		const event = await Event.findOne(
+			{ title },
+			{ attendeeIds: 0, address: 0 }
+		).populate("organizerId", { name: 1, pfp: 1, _id: 0 });
 		if (!event) {
 			return res.status(401).json({ error: "Event not found" });
 		}
@@ -220,6 +220,37 @@ export const isOrganizerOfEvent = async (req, res) => {
 		res.status(200).json({ isOrganizer });
 	} catch (error) {
 		console.error("Error checking organizer status:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+};
+
+export const getAddressAndAttendees = async (req, res) => {
+	const { title } = req.body;
+	const userId = req.userId;
+
+	try {
+		const event = await Event.findOne({ title }).populate(
+			"attendeeIds",
+			"name pfp"
+		);
+		if (!event) {
+			return res.status(404).json({ error: "Event not found" });
+		}
+		if (
+			event.organizerId.toString() === userId ||
+			event.attendeeIds.some((id) => id._id.toString() === userId)
+		) {
+			return res.status(200).json({
+				address: event.address,
+				attendees: event.attendeeIds.map(({ name, pfp }) => ({
+					name,
+					pfp,
+				})),
+			});
+		}
+		return res.status(403).json({ error: "Unauthorized action" });
+	} catch (error) {
+		console.error("Error fetching address and attendees:", error);
 		res.status(500).json({ error: "Internal server error" });
 	}
 };

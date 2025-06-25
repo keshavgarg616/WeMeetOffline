@@ -9,6 +9,7 @@ import {
 	getEventByTitle,
 	isRegisteredForEvent,
 	isOrganizerOfEvent,
+	getAddressAndAttendees,
 } from "../controllers/eventController.js";
 import verifyToken from "../middleware.js";
 
@@ -23,5 +24,10 @@ eventRouter.post("/register-for-event", verifyToken, registerForEvent);
 eventRouter.post("/unregister-from-event", verifyToken, unregisterFromEvent);
 eventRouter.post("/is-registered-for-event", verifyToken, isRegisteredForEvent);
 eventRouter.post("/is-organizer-of-event", verifyToken, isOrganizerOfEvent);
+eventRouter.post(
+	"/get-address-and-attendees",
+	verifyToken,
+	getAddressAndAttendees
+);
 
 export default eventRouter;
