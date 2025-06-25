@@ -23,8 +23,13 @@ export class ApiService {
 		};
 	}
 
-	signup(name: string, email: string, password: string): Observable<any> {
-		const body = { name, email, password };
+	signup(
+		name: string,
+		email: string,
+		password: string,
+		imgUrl: string
+	): Observable<any> {
+		const body = { name, email, password, imgUrl };
 		return this.http.post(`${this.apiUrl}signup`, body);
 	}
 
@@ -77,7 +82,6 @@ export class ApiService {
 		address: string,
 		isVirtual: boolean,
 		tags: string[],
-		timezone: string,
 		imgUrl: string
 	): Observable<any> {
 		const body = {
@@ -88,7 +92,6 @@ export class ApiService {
 			address,
 			isVirtual,
 			tags,
-			timezone,
 			imgUrl,
 		};
 		return this.http.post(
@@ -116,10 +119,10 @@ export class ApiService {
 		);
 	}
 
-	getEventById(eventId: string): Observable<any> {
-		const body = { eventId };
+	getEventByTitle(title: string): Observable<any> {
+		const body = { title };
 		return this.http.post(
-			`${this.apiUrl}get-event-by-id`,
+			`${this.apiUrl}get-event-by-title`,
 			body,
 			this.getAuthHeaders()
 		);
@@ -132,8 +135,7 @@ export class ApiService {
 		endsAt: string,
 		address: string,
 		isVirtual: boolean,
-		tags: string[],
-		timezone: string
+		tags: string[]
 	): Observable<any> {
 		const body = {
 			eventId,
@@ -143,7 +145,6 @@ export class ApiService {
 			address,
 			isVirtual,
 			tags,
-			timezone,
 		};
 		return this.http.post(
 			`${this.apiUrl}update-event`,
@@ -152,8 +153,8 @@ export class ApiService {
 		);
 	}
 
-	registerForEvent(eventId: string): Observable<any> {
-		const body = { eventId };
+	registerForEvent(title: string): Observable<any> {
+		const body = { title };
 		return this.http.post(
 			`${this.apiUrl}register-for-event`,
 			body,
@@ -161,10 +162,28 @@ export class ApiService {
 		);
 	}
 
-	unregisterFromEvent(eventId: string): Observable<any> {
-		const body = { eventId };
+	unregisterFromEvent(title: string): Observable<any> {
+		const body = { title };
 		return this.http.post(
 			`${this.apiUrl}unregister-from-event`,
+			body,
+			this.getAuthHeaders()
+		);
+	}
+
+	isRegisteredForEvent(title: string): Observable<any> {
+		const body = { title };
+		return this.http.post(
+			`${this.apiUrl}is-registered-for-event`,
+			body,
+			this.getAuthHeaders()
+		);
+	}
+
+	isOrganizerOfEvent(title: string): Observable<any> {
+		const body = { title };
+		return this.http.post(
+			`${this.apiUrl}is-organizer-of-event`,
 			body,
 			this.getAuthHeaders()
 		);

@@ -1,24 +1,97 @@
-<div style="float: right; margin-right: 10px; margin-top: 10px;">
-    <a href="/create-event">
-        <button matButton color="primary" style="font-size: xx-large; width: 50px; height: 50px">+</button>
-    </a>
+<div style="position: absolute; top: 5px; right: 10px;">
     <a href="/logout">
         <br>
         <button matButton color="warn" style="color: red; width: 50px; height: auto; font-size: 1.3em;">Logout</button>
     </a>
 </div>
 
-<div style="text-align: center; width: 80%; margin: auto;">
-    <h1 style="font-weight: bold; font-size: 2.5em;">Events</h1><br>
+<div style="text-align: center; width: 85%;margin: 15px auto auto auto;">
+    <h1 style="width: 100%;text-align: left; font-size: 1.5em;">Upcoming events</h1>
     <div style="align-items: right; display:flex; flex-wrap: wrap; gap: 16px; justify-content: left;">
-        <mat-card *ngFor="let item of events" style="width: calc(25% - 16px); min-width: 200px; max-width: 400px;">
-            <mat-card-content>
-                <img src="{{ item.picture }}" alt="Event Banner" style="width: 100%; height: auto; color: tomato;">
+        @for(item of events; track item.title) {
+        <mat-card
+            style="width: calc(25% - 16px); min-width: 200px; max-width: 400px; cursor: pointer; padding: 4px; vertical-align: center; text-align: center;"
+            (click)="eventClicked($index)">
+            <mat-card-content style="padding: 0;">
+                <div style="position: relative; height: 220px; overflow: hidden;">
+                    <img src="{{ item.picture }}" alt="Event Banner" style="
+				width: 90%;
+				height: 100%;
+                margin: auto;
+				object-fit: contain;
+				display: block;
+			" />
+                    <span style="
+				position: absolute;
+				bottom: 6px;
+				right: 6px;
+				background-color: rgba(0, 0, 0, 0.6);
+				color: white;
+				padding: 4px 8px;
+				border-radius: 4px;
+				font-size: 0.85rem;
+			">
+                        🕙{{ item.beginsAt | date: 'h:mm a' }}
+                    </span>
+                    <span style="
+				position: absolute;
+				bottom: 6px;
+				left: 6px;
+				background-color: rgba(0, 0, 0, 0.6);
+				color: white;
+				padding: 4px 8px;
+				border-radius: 4px;
+				font-size: 0.85rem;
+			">
+                        📅{{ item.beginsAt | date }}
+                    </span>
+                </div>
             </mat-card-content>
-            <mat-card-title style="font-size: 1.1em; font-weight: bold;">{{ item.title }}<div
-                    style="font-size: 0.8em; font-weight: normal;">
-                    {{
-                    item.description }}</div></mat-card-title>
+
+            <mat-card-title
+                style="font-size: 1.1em; font-weight: bold; width: 100%; text-align: left; margin-left: 12px; margin-bottom: 6px; margin-top: 5px;">
+                {{ item.title }}
+                <br>
+                <div
+                    style="margin-top: 20px; display: flex; align-items: center; gap: 8px; font-weight: normal; font-size: 0.8em;">
+                    <img #imgRef src="{{ item.organizerId.pfp }}" alt="👤"
+                        style="height: 25px; width: 25px; border-radius: 50%;"
+                        (error)="imgRef.style.display='none'; emojiRef.innerHTML='👤'; emojiRef.style.display='inline';" />
+                    <span #emojiRef style="display: none; font-size: 1.1em;"></span>
+                    <span>{{ item.organizerId.name }}</span>
+                    <br>
+                </div>
+                <div style="font-weight: normal; font-size: 0.8em;">
+                    @if(item.isVirtual) {📽️ Virtual}
+                    @if (!item.isVirtual) {📍 {{ item.address }}}
+                </div>
+            </mat-card-title>
+            <span style="
+                    text-align: right;
+				position: absolute;
+				top: 6px;
+				right: 6px;
+				color: white;
+				padding: 4px;
+				border-radius: 4px;
+				font-size: 0.85rem;
+			">
+                @for(tag of item.tags; track tag) {
+                <span
+                    style="text-align: right; margin-right: -5px; margin-bottom: 4px; width: fit-content; padding-left: 4px; padding-right: 4px; background-color: rgba(0, 0, 0, 0.6); border-radius: 5px;">
+                    #{{
+                    tag }}</span>
+                <div style="height: 3px"></div>
+                }
+            </span>
+        </mat-card>
+        }
+        <mat-card
+            style="width: calc(25% - 16px); min-width: 200px; max-width: 400px; cursor: pointer; padding: 4px; vertical-align: middle; text-align: center;">
+            <a href="/create-event"
+                style="height: 100%; width: 100%; display: flex; justify-content: center; align-items: center; text-decoration: none; font-size: 200px; color: cyan;">
+                +
+            </a>
         </mat-card>
     </div>
 </div>

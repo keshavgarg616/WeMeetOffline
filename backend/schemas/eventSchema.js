@@ -25,7 +25,7 @@ const eventSchema = new mongoose.Schema({
 	},
 	address: {
 		type: String,
-		required: true,
+		default: "",
 	},
 	tags: {
 		type: [String],
@@ -42,10 +42,6 @@ const eventSchema = new mongoose.Schema({
 			ref: "User",
 		},
 	],
-	timezone: {
-		type: String,
-		required: true,
-	},
 	picture: {
 		type: String,
 		default: "https://example.com/default-event-pic.png",

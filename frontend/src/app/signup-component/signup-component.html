@@ -65,6 +65,13 @@
 " style="width: 600px; color: red; background-color: #f8d7da; margin: 0 auto;">
             Passwords do not match.
         </div><br>
+        <div style="width: 40%; text-align: left; margin: auto;">
+            <ng-picker-overlay [apikey]="FILESTACK_API_KEY" (uploadSuccess)="onUploadSuccess($event)">
+                <button matButton
+                    style="margin-left: -12px; margin-top: -10px; font-size: 1em; color: greenyellow;">Choose Profile
+                    Picture</button>
+            </ng-picker-overlay>
+        </div>
 
         <button mat-raised-button type="submit" [disabled]="signUpForm.invalid" color="primary">Submit</button><br><br>
         <a mat-button color="accent" style="color: rgb(144, 144, 236)" href="/login">Already have an account? Log In</a>

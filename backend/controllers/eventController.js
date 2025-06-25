@@ -9,7 +9,6 @@ export const addEvent = async (req, res) => {
 		isVirtual,
 		address,
 		tags,
-		timezone,
 		imgUrl,
 	} = req.body;
 
@@ -32,7 +31,6 @@ export const addEvent = async (req, res) => {
 			address,
 			tags,
 			organizerId: userId,
-			timezone,
 			attendeeIds: [],
 			picture: imgUrl,
 		});
@@ -51,8 +49,8 @@ export const addEvent = async (req, res) => {
 export const getEvents = async (req, res) => {
 	try {
 		const events = await Event.find()
-			.populate("organizerId", "name email")
-			.populate("attendeeIds", "name email")
+			.populate("organizerId", "name email pfp")
+			.populate("attendeeIds", "name email pfp")
 			.sort({ beginsAt: 1 }); // Sort by beginning time
 		res.status(200).json(events);
 	} catch (error) {
@@ -83,15 +81,15 @@ export const deleteEvent = async (req, res) => {
 	}
 };
 
-export const getEventById = async (req, res) => {
-	const { eventId } = req.params;
+export const getEventByTitle = async (req, res) => {
+	const { title } = req.body;
 
 	try {
-		const event = await Event.findById(eventId)
-			.populate("organizerId", "name email")
-			.populate("attendeeIds", "name email");
+		const event = await Event.findOne({ title })
+			.populate("organizerId", "name email pfp")
+			.populate("attendeeIds", "name email pfp");
 		if (!event) {
-			return res.status(404).json({ error: "Event not found" });
+			return res.status(401).json({ error: "Event not found" });
 		}
 		res.status(200).json(event);
 	} catch (error) {
@@ -139,11 +137,11 @@ export const updateEvent = async (req, res) => {
 };
 
 export const registerForEvent = async (req, res) => {
-	const { eventId } = req.params;
+	const { title } = req.body;
 	const userId = req.userId;
 
 	try {
-		const event = await Event.findById(eventId);
+		const event = await Event.findOne({ title });
 		if (!event) {
 			return res.status(404).json({ error: "Event not found" });
 		}
@@ -165,11 +163,11 @@ export const registerForEvent = async (req, res) => {
 };
 
 export const unregisterFromEvent = async (req, res) => {
-	const { eventId } = req.params;
+	const { title } = req.body;
 	const userId = req.userId;
 
 	try {
-		const event = await Event.findById(eventId);
+		const event = await Event.findOne({ title });
 		if (!event) {
 			return res.status(404).json({ error: "Event not found" });
 		}
@@ -188,6 +186,40 @@ export const unregisterFromEvent = async (req, res) => {
 		});
 	} catch (error) {
 		console.error("Error unregistering from event:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+};
+
+export const isRegisteredForEvent = async (req, res) => {
+	const { title } = req.body;
+	const userId = req.userId;
+
+	try {
+		const event = await Event.findOne({ title });
+		if (!event) {
+			return res.status(404).json({ error: "Event not found" });
+		}
+		const isRegistered = event.attendeeIds.includes(userId);
+		res.status(200).json({ isRegistered });
+	} catch (error) {
+		console.error("Error checking registration status:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+};
+
+export const isOrganizerOfEvent = async (req, res) => {
+	const { title } = req.body;
+	const userId = req.userId;
+
+	try {
+		const event = await Event.findOne({ title });
+		if (!event) {
+			return res.status(404).json({ error: "Event not found" });
+		}
+		const isOrganizer = event.organizerId.toString() === userId;
+		res.status(200).json({ isOrganizer });
+	} catch (error) {
+		console.error("Error checking organizer status:", error);
 		res.status(500).json({ error: "Internal server error" });
 	}
 };

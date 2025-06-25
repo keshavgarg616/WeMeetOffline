@@ -1,0 +1,168 @@
+<!-- Go Back Button -->
+<div style="position: absolute; top: 15px; right: 15px;">
+    <a href="/home">
+        <br />
+        <button matButton color="warn" style="color: red; font-size: 1.1em; background-color: white;">
+            Go Back
+        </button>
+    </a>
+</div>
+
+<!-- Event Banner Image -->
+<div style="text-align: center; margin-top: 30px; position: relative;">
+    <img src="{{ this.event?.picture }}" style="max-height: 300px; width: auto; height: 100%; border-radius: 10px;"
+        alt="Event Banner" />
+    <div style="
+            position: absolute;
+            bottom: -8%;
+            left: 7%;
+            font-size: 2em;
+            background-color: rgb(9, 9, 9);
+            border-radius: 12px;
+            padding: 10px;
+        ">
+        📅{{ this.event?.beginsAt | date }}
+    </div>
+    <div style="
+            position: absolute;
+            bottom: -8%;
+            right: 7%;
+            font-size: 2em;
+            background-color: rgb(9, 9, 9);
+            border-radius: 12px;
+            padding: 10px;
+        ">
+        🕙{{ this.event?.beginsAt | date: 'h:mm a' }}
+    </div>
+</div>
+
+<!-- Main Content Container -->
+<div style="
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        width: 100%;
+        gap: 15px;
+        margin-top: 15px;
+    ">
+    <!-- Title + Tags Section -->
+    <div style="
+            padding: 20px;
+            background-color: #191C1C;
+            width: 85%;
+            gap: 15px;
+            padding-top: 0px;
+            border-radius: 20px;
+            position: relative;
+        ">
+        <h1 style="margin-bottom: 2px;">{{ title }}</h1>
+        By {{ this.event?.organizerId?.name }}
+        <br />
+        <div style="height: 10px;"></div>
+        @for (tag of event?.tags; track tag) {
+        <span style="
+                color: white;
+                background-color: #3f51b5;
+                padding: 2px 6px;
+                border-radius: 5px;
+                margin-right: 6px;
+                font-size: 0.85em;
+                white-space: nowrap;
+            ">
+            {{ tag }}
+        </span>
+        }
+        <div style="position: absolute; top: 20px; right: 20px;">
+            @if (!isOrganizer) {
+            @if(!isRegistered) {
+            <button mat-flat-button color="primary" (click)="registerForEvent()">
+                Join Event
+            </button>
+            }
+            @if(isRegistered) {
+            <button mat-flat-button color="primary" (click)="leaveEvent()">
+                Leave Event
+            </button>
+            }
+            }
+            @if(isOrganizer) {
+            <button mat-flat-button color="primary" (click)="editEvent()">
+                Edit Event
+            </button>
+            }
+        </div>
+    </div>
+
+    <!-- About and Side Panel Section -->
+    <div style="
+            width: 87.8%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        ">
+        <div style="flex: 1.7;">
+            <div style="
+                background-color: #191C1C;
+                padding: 15px;
+                border-radius: 20px;
+                box-sizing: border-box;
+            ">
+                <span style="font-weight: bold; font-size: 1.15em;">About this event:</span>
+                <br />
+                {{ event?.description }}
+            </div>
+            <div style="
+                margin-top: 15px;
+                background-color: #191C1C;
+                padding: 15px;
+                border-radius: 20px;
+                box-sizing: border-box;">
+                @if (event?.attendeeIds?.length === 0) {
+                <span style="font-weight: bold; font-size: 1.15em;">
+                    No participants yet.
+                </span>
+                }
+                @if (event?.attendeeIds?.length !== 0) {
+                <span style="font-weight: bold; font-size: 1.15em;">Participants:</span>
+                @for (attendee of event?.attendeeIds; track attendee.name) {
+                <div style="margin-top: 5px;">
+                    {{ attendee.name }}
+                </div>
+                }
+                }
+            </div>
+        </div>
+
+        <div style="
+                flex: 1;
+                background-color: #191C1C;
+                padding: 15px;
+                border-radius: 20px;
+                box-sizing: border-box;
+            ">
+            <!-- Event Info -->
+            <span style="font-weight: bold; font-size: 1.15em;">Event Type:</span><br>
+            {{event?.isVirtual ? "Virtual" : "In-Person"}}
+            <br><br>
+            @if (!event?.isVirtual) {
+            <span style="font-weight: bold; font-size: 1.15em;">Location:</span><br>
+            {{event?.address}}
+            <br>
+            <br>
+            }
+            <span style="font-weight: bold; font-size: 1.15em;">Date & Time:</span><br>
+
+            {{ this.event?.beginsAt | date }}, {{ this.event?.beginsAt | date: 'h:mm a' }}
+            -
+            {{ this.event?.endsAt | date }}, {{ this.event?.endsAt | date: 'h:mm a' }} ({{ this.event?.endsAt |
+            date: 'ZZZZ' }})
+            <br><br>
+            <span style="font-weight: bold; font-size: 1.15em;">Organized by:</span><br>
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px;">
+                <img src="{{ event?.organizerId?.pfp }}" alt="👤"
+                    style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                <span style="font-size: 20px">{{ event?.organizerId?.name }}</span>
+            </div>
+        </div>
+    </div>
+</div>

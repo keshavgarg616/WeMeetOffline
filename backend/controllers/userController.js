@@ -9,7 +9,7 @@ import nodemailer from "nodemailer";
 dotenv.config();
 
 export const signUp = async (req, res) => {
-	const { name, email, password } = req.body;
+	const { name, email, password, imgUrl } = req.body;
 	const transporter = nodemailer.createTransport({
 		host: process.env.EMAIL_SMTP_HOST,
 		port: process.env.EMAIL_SMTP_PORT,
@@ -33,15 +33,16 @@ export const signUp = async (req, res) => {
 			email,
 			password,
 			authCode,
+			pfp: imgUrl,
 			isVerified: false,
 		});
 		(async () => {
 			const info = await transporter.sendMail({
 				from: `"${process.env.EMAIL_NAME}" <${process.env.EMAIL_USER}>`, // sender address
 				to: email,
-				subject: "ConceptAI Sign Up",
-				text: `Hi ${name}! You have signed up for ConceptAI!`,
-				html: `<b><p>Hi ${name}!</p></b><p>You have signed up for ConceptAI!</p><Click on the link below to verify your email address:</p><p><a href="${process.env.FRONTEND_URL}/verify-email?code=${authCode}">Verify Email</a></p>`,
+				subject: "We Meet Offline Sign Up",
+				text: `Hi ${name}! You have signed up for We Meet Offline!`,
+				html: `<b><p>Hi ${name}!</p></b><p>You have signed up for We Meet Offline!</p><Click on the link below to verify your email address:</p><p><a href="${process.env.FRONTEND_URL}/verify-email?code=${authCode}">Verify Email</a></p>`,
 			});
 		})();
 		await newUser.save();
@@ -190,9 +191,9 @@ export const requestPasswordReset = async (req, res) => {
 		await transporter.sendMail({
 			from: `"${process.env.EMAIL_NAME}" <${process.env.EMAIL_USER}>`, // sender address
 			to: email,
-			subject: "ConceptAI Password Reset",
-			text: `Hi ${user.name}! You have requested a password reset for ConceptAI.`,
-			html: `<b><p>Hi ${user.name}!</p></b><p>You have requested a password reset for ConceptAI.</p><Click on the link below to reset your password:</p><p><a href="${process.env.FRONTEND_URL}/reset-password?code=${authCode}">Reset Password</a></p>`,
+			subject: "We Meet Offline Password Reset",
+			text: `Hi ${user.name}! You have requested a password reset for We Meet Offline.`,
+			html: `<b><p>Hi ${user.name}!</p></b><p>You have requested a password reset for We Meet Offline.</p><Click on the link below to reset your password:</p><p><a href="${process.env.FRONTEND_URL}/reset-password?code=${authCode}">Reset Password</a></p>`,
 		});
 
 		res.status(200).json({

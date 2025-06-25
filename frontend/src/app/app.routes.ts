@@ -8,6 +8,7 @@ import { resetPasswordComponent } from "./reset-password-component/reset-passwor
 import { HomePageComponent } from "./home-page-component/home-page-component";
 import { authGuard } from "./auth-guard.js";
 import { CreateEventComponent } from "./create-event-component/create-event-component";
+import { EventComponent } from "./event-component/event-component";
 
 export const routes: Routes = [
 	{ path: "", redirectTo: "login", pathMatch: "full" },
@@ -21,6 +22,11 @@ export const routes: Routes = [
 	{
 		path: "create-event",
 		component: CreateEventComponent,
+		canActivate: [authGuard],
+	},
+	{
+		path: "event",
+		component: EventComponent,
 		canActivate: [authGuard],
 	},
 	{ path: "**", redirectTo: "login", pathMatch: "full" },

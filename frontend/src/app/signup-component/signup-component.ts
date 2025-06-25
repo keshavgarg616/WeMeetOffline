@@ -16,6 +16,8 @@ import {
 	createPasswordMatchValidator,
 	createPasswordValidator,
 } from "../passwordStrengthValidator";
+import { FilestackModule } from "@filestack/angular";
+import { environment } from "../../environments/environment";
 
 @Component({
 	selector: "signup-route",
@@ -27,12 +29,15 @@ import {
 		ReactiveFormsModule,
 		MatFormFieldModule,
 		MatButtonModule,
+		FilestackModule,
 		MatInputModule,
 	],
 })
 export class SignUpComponent {
 	router: Router;
 	invalidInfo: Array<string> = [];
+	imgUrl: string = "https://example.com/default-image.jpg";
+	FILESTACK_API_KEY: string = environment.FILESTACK_API_KEY;
 
 	constructor(
 		private apiService: ApiService,
@@ -42,6 +47,10 @@ export class SignUpComponent {
 		if (localStorage.getItem("token")) {
 			this.router.navigate(["/login"]);
 		}
+	}
+
+	onUploadSuccess(res: any) {
+		this.imgUrl = res.filesUploaded[0].url;
 	}
 
 	signUpForm = new FormGroup(
@@ -63,11 +72,20 @@ export class SignUpComponent {
 			const { name, email, pswd } = this.signUpForm.value;
 			let password = pswd?.trim().toString();
 			this.apiService
-				.signup(name || "", email || "", password || "")
+				.signup(
+					name || "",
+					email || "",
+					password || "",
+					this.imgUrl || ""
+				)
 				.subscribe({
 					next: (response) => {
-						this.router.navigate(["/login"]);
-						this.invalidInfo = [];
+						this.invalidInfo.push(
+							"Please verify your email before logging in"
+						);
+						setTimeout(() => {
+							this.router.navigate(["/login"]);
+						}, 1500);
 					},
 					error: (error) => {
 						if (error.error.error.includes("User already exists")) {

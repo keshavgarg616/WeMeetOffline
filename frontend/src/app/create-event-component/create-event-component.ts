@@ -43,13 +43,12 @@ export class CreateEventComponent {
 	endDateAndTime: Date | null = null;
 	router: Router = inject(Router);
 	FILESTACK_API_KEY: string = environment.FILESTACK_API_KEY;
-	selectedFile: File | undefined;
 	imgUrl: string = "https://example.com/default-image.jpg";
 
 	eventForm: FormGroup = new FormGroup({
 		title: new FormControl("", Validators.required),
 		description: new FormControl("", Validators.required),
-		address: new FormControl("", Validators.required),
+		address: new FormControl(""),
 		tags: new FormControl(""),
 		isVirtual: new FormControl(true),
 		startDate: new FormControl("", Validators.required),
@@ -88,7 +87,6 @@ export class CreateEventComponent {
 				this.eventForm.value.address,
 				this.eventForm.value.isVirtual,
 				tagsArr,
-				"America/New_York",
 				this.imgUrl
 			)
 			.subscribe({
@@ -97,6 +95,9 @@ export class CreateEventComponent {
 					this.router.navigate(["/home"]);
 				},
 				error: (error) => {
+					if (error.error.error.includes("Invalid token")) {
+						this.router.navigate(["/logout"]);
+					}
 					console.error("Error creating event:", error);
 				},
 			});
