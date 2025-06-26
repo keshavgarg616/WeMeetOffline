@@ -4,6 +4,8 @@ import { Router } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { MatButtonModule } from "@angular/material/button";
 import { firstValueFrom } from "rxjs";
+import { User } from "../../interfaces/userInterface";
+import { Event } from "../../interfaces/eventInterface";
 
 @Component({
 	selector: "app-event-component",
@@ -134,23 +136,22 @@ export class EventComponent {
 			state: { eventTitle: this.title },
 		});
 	}
-}
 
-interface User {
-	name: string;
-	pfp: string;
-}
-
-interface Event {
-	_id: string;
-	title: string;
-	description: string;
-	beginsAt: Date;
-	endsAt: Date;
-	isVirtual: boolean;
-	tags: string[];
-	organizerId: User;
-	timezone: string;
-	picture: string;
-	__v: number;
+	deleteEvent() {
+		this.apiService.deleteEvent(this.title).subscribe({
+			next: (response) => {
+				if (response.error) {
+					console.error("Error deleting event");
+				} else {
+					this.router.navigate(["/home"]);
+				}
+			},
+			error: (err) => {
+				if (err.error.error.includes("Invalid token")) {
+					this.router.navigate(["/logout"]);
+				}
+				console.error("Error deleting event: ", err);
+			},
+		});
+	}
 }

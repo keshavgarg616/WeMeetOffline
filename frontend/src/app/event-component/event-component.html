@@ -84,9 +84,15 @@
             }
             }
             @if(isOrganizer) {
-            <button mat-flat-button color="primary" (click)="editEvent()">
-                Edit Event
-            </button>
+            <div style="text-align: right;">
+                <button mat-flat-button color="primary" (click)="editEvent()">
+                    Edit Event
+                </button><br>
+                <button mat-flat-button style="background-color: red; margin-top: 5px;" color="warn"
+                    (click)="deleteEvent()">
+                    Delete Event
+                </button>
+            </div>
             }
         </div>
     </div>

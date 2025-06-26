@@ -1,8 +1,6 @@
 <div style="position: absolute; top: 15px; right: 15px;">
-    <a href="/home">
-        <br>
-        <button matButton color="warn" style="color: red; font-size: 1.1em;">Go Back</button>
-    </a>
+    <br>
+    <button matButton color="warn" style="color: red; font-size: 1.1em;" (click)="goBack()">Go Back</button>
 </div>
 <div style="text-align: center; align-items: center; margin: auto">
     @if (invalidInfo.length > 0) {
@@ -25,13 +23,25 @@
         <br>
     </div>
     }
-    <h1>Create Event</h1>
+    @if (eventUpdated) {
+    <div style="
+        color: yellowgreen;
+        font-weight: bold;
+        background-color: green;
+        border-radius: 5px;
+        padding: 10px;
+        width: 800px;
+        margin: 0 auto;
+        text-align: center;
+    ">
+        Event updated successfully!
+        <br>
+    </div>
+    }
+    <h1>Update Event</h1>
     <form [formGroup]="eventForm" (ngSubmit)="onSubmit()">
         <div style="width: fit-content; margin: auto;">
-            <mat-form-field appearance="fill" style="width: 600px;">
-                <mat-label>Event Title</mat-label>
-                <input matInput formControlName="title" required>
-            </mat-form-field>
+            Title: {{event?.title}}
             <br>
             <mat-form-field appearance="fill" style="width: 600px;">
                 <mat-label>Description</mat-label>
@@ -90,15 +100,9 @@
                     <span>Virtual Event</span>
                     <mat-slide-toggle formControlName="isVirtual"></mat-slide-toggle>
                 </div>
-                <br>
-                <ng-picker-overlay [apikey]="FILESTACK_API_KEY" (uploadSuccess)="onUploadSuccess($event)">
-                    <button matButton
-                        style="margin-left: -12px; margin-top: -10px; font-size: 1em; color: greenyellow;">Choose Event
-                        Banner</button>
-                </ng-picker-overlay>
             </div>
         </div>
         <br>
-        <button mat-raised-button color="primary" type="submit" [disabled]="eventForm.invalid">Create Event</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="eventForm.invalid">Update Event</button>
     </form>
 </div>

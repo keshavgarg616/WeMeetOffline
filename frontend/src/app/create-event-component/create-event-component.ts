@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { ChangeDetectorRef, Component, inject } from "@angular/core";
 import { ApiService } from "../api.service";
 import {
 	FormControl,
@@ -40,6 +40,7 @@ import { provideNativeDateAdapter } from "@angular/material/core";
 })
 export class CreateEventComponent {
 	startDateAndTime: Date | null = null;
+	invalidInfo: Array<string> = [];
 	endDateAndTime: Date | null = null;
 	router: Router = inject(Router);
 	FILESTACK_API_KEY: string = environment.FILESTACK_API_KEY;
@@ -61,8 +62,12 @@ export class CreateEventComponent {
 		this.imgUrl = res.filesUploaded[0].url;
 	}
 
-	constructor(private apiService: ApiService) {}
+	constructor(
+		private apiService: ApiService,
+		private cdr: ChangeDetectorRef
+	) {}
 	onSubmit() {
+		this.invalidInfo = [];
 		let tagsArr = [];
 		if (this.eventForm.value.tags !== "") {
 			try {
@@ -97,6 +102,18 @@ export class CreateEventComponent {
 				error: (error) => {
 					if (error.error.error.includes("Invalid token")) {
 						this.router.navigate(["/logout"]);
+					}
+					if (
+						error.error.error.includes(
+							"Event with this title already exists"
+						)
+					) {
+						this.invalidInfo.push(
+							"Event with this title already exists"
+						);
+						this.eventForm.controls["title"].setValue("");
+						this.cdr.detectChanges();
+						console.log("Event with this title already exists");
 					}
 					console.error("Error creating event:", error);
 				},
