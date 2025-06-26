@@ -74,16 +74,21 @@
         <div style="position: absolute; top: 20px; right: 20px;">
             @if (!isOrganizer) {
             @if(!isRegistered) {
+            @if (!hasRequestedToAttend) {
             <button mat-flat-button color="primary" (click)="registerForEvent()">
                 Join Event
             </button>
             } @else {
             <button mat-flat-button color="primary" (click)="leaveEvent()">
+                Leave Waiting List
+            </button>
+            }
+            } @else {
+            <button mat-flat-button color="primary" (click)="leaveEvent()">
                 Leave Event
             </button>
             }
-            }
-            @if(isOrganizer) {
+            } @else {
             <div style="text-align: right;">
                 <button mat-flat-button color="primary" (click)="editEvent()">
                     Edit Event
@@ -122,21 +127,56 @@
                 border-radius: 20px;
                 box-sizing: border-box;">
                 @if (canViewAttendees) {
-                @if (attendeeIds.length === 0) {
+                @if (attendeeIds.length === 0 && requestedAttendeeIds.length === 0) {
                 <span style="font-weight: bold; font-size: 1.15em;">
                     No participants yet.
                 </span>
                 } @else {
                 <span style="font-weight: bold; font-size: 1.15em;">Participants:</span>
-                @for (attendee of attendeeIds; track attendee.pfp) {
-                <div style="margin-top: 5px;">
-                    {{ attendee.name }}
+                @if (attendeeIds.length === 0) {
+                <br>
+                <span style="font-size: 1.15em; color: #888;">
+                    No participants yet.</span>
+                }
+                @for (attendee of attendeeIds; track attendee._id) {
+                <div style="display: flex; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 5px;">
+                        <img style="border-radius: 50%; height: 20px; width: 20px;" src="{{attendee.pfp}}">
+                        <span style="font-size: 14px; width: max-content;">{{ attendee.name }}</span>
+                    </div>
+                    <div style="vertical-align: middle; height: 100%">
+                        @if (isOrganizer) {
+                        <button mat-button color="primary" style="font-size: 1em;"
+                            (click)="removeAttendee(attendee._id)">❌</button>}
+                    </div>
                 </div>
+                }
+                @if (isOrganizer) {
+                <div style="font-weight: bold; font-size: 1.15em; margin-top: 30px;">Join Requests:</div>
+                @if (requestedAttendeeIds.length === 0) {
+                <span style="font-size: 1.15em; color: #888;">
+                    No requests yet.</span>
+                } @else {
+                @for (attendee of requestedAttendeeIds; track attendee._id) {
+                <div style="display: flex; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 5px;">
+                        <img style="border-radius: 50%; height: 20px; width: 20px;" src="{{attendee.pfp}}">
+                        <span style="font-size: 14px; width: max-content;">{{ attendee.name }}</span>
+                    </div>
+                    <div style="vertical-align: middle; height: 100%">
+                        <button mat-button color="primary" style="font-size: 1em;"
+                            (click)="approveAttendee(attendee._id)">✔️</button> / <button mat-button color="primary"
+                            style="font-size: 1em;" (click)="removeRequestedAttendee(attendee._id)">❌</button>
+                    </div>
+                </div>
+                }
+                }
                 }
                 }
                 } @else {
                 <span style="font-size: 1.15em; color: #888;">
-                    Register to view participants.
+                    {{!hasRequestedToAttend ? 'Register to view participants.' : 'Waiting for organizer approval to show
+                    participants.'}}
                 </span>
                 }
             </div>
@@ -158,7 +198,8 @@
             @if (isRegistered || isOrganizer) {
             {{address}}
             } @else {
-            <span style="color: #888;">Register to view this field.</span>
+            <span style="color: #888;">{{!hasRequestedToAttend? 'Register to view this field.' : 'Waiting for organizer
+                approval to show this field.'}}</span>
             }
             <br>
             <br>
