@@ -83,6 +83,7 @@ export class SignUpComponent {
 						this.invalidInfo.push(
 							"Please verify your email before logging in"
 						);
+						this.cdr.detectChanges();
 						setTimeout(() => {
 							this.router.navigate(["/login"]);
 						}, 1500);

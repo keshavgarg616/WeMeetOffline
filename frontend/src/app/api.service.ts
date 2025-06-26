@@ -110,8 +110,8 @@ export class ApiService {
 		);
 	}
 
-	deleteEvent(eventId: string): Observable<any> {
-		const body = { eventId };
+	deleteEvent(title: string): Observable<any> {
+		const body = { title };
 		return this.http.post(
 			`${this.apiUrl}delete-event`,
 			body,
@@ -129,7 +129,7 @@ export class ApiService {
 	}
 
 	updateEvent(
-		eventId: string,
+		title: string,
 		description: string,
 		beginsAt: string,
 		endsAt: string,
@@ -138,7 +138,7 @@ export class ApiService {
 		tags: string[]
 	): Observable<any> {
 		const body = {
-			eventId,
+			title,
 			description,
 			beginsAt,
 			endsAt,
