@@ -1,9 +1,9 @@
 # WeMeetOffline 🎉
 
-WeMeetOffline is a full-stack web application built with **Angular** and **Node.js** to promote meaningful connections through virtual and in-person events. Users can create, join, and manage events—making it easy to meet like-minded people offline or online.  
-  
+WeMeetOffline is a full-stack web application built with **Angular** and **Node.js** to promote meaningful connections through virtual and in-person events. Users can create, join, and manage events—making it easy to meet like-minded people offline or online.
+
 Available at https://wemeetoffline.web.app/
-  
+
 ## 🛠️ Tech Stack
 
 -   **Frontend**: Angular 20
@@ -106,10 +106,6 @@ Visit: `http://localhost:4200`
 ## 📸 Screenshots
 
 TO_DO
-
-## TO DO
-
-Implement edit event page at /edit-event  
 
 ## 📬 Contact
 
