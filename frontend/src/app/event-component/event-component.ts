@@ -19,7 +19,9 @@ export class EventComponent {
 	title: string = "";
 	isRegistered: boolean = false;
 	isOrganizer: boolean = false;
+	hasRequestedToAttend: boolean = false;
 	attendeeIds: User[] = [];
+	requestedAttendeeIds: User[] = [];
 	address: string = "";
 	canViewAttendees: boolean = false;
 
@@ -60,6 +62,11 @@ export class EventComponent {
 					this.apiService.isOrganizerOfEvent(this.title)
 				)
 			).isOrganizer;
+			this.hasRequestedToAttend = (
+				await firstValueFrom(
+					this.apiService.hasRequestedToAttend(this.title)
+				)
+			).hasRequested;
 
 			if (this.isRegistered || this.isOrganizer) {
 				const res = await firstValueFrom(
@@ -68,6 +75,9 @@ export class EventComponent {
 				this.address = res.address;
 				this.attendeeIds = res.attendees;
 				this.canViewAttendees = true;
+				if (this.isOrganizer) {
+					this.requestedAttendeeIds = res.requestedAttendees;
+				}
 			}
 			this.cdr.detectChanges();
 		} catch (err: any) {
@@ -83,23 +93,8 @@ export class EventComponent {
 				if (response.error) {
 					console.error("Error registering for event");
 				} else {
-					this.isRegistered = true;
-					this.apiService
-						.getAddressAndAttendees(this.title)
-						.subscribe({
-							next: (response) => {
-								if (response.error) {
-									console.error(
-										"Error fetching address and attendees"
-									);
-								} else {
-									this.address = response.address;
-									this.attendeeIds = response.attendees;
-									this.canViewAttendees = true;
-									this.cdr.detectChanges();
-								}
-							},
-						});
+					this.hasRequestedToAttend = true;
+					this.cdr.detectChanges();
 				}
 			},
 			error: (err) => {
@@ -117,6 +112,7 @@ export class EventComponent {
 				if (response.error) {
 					console.error("Error leaving event");
 				} else {
+					this.hasRequestedToAttend = false;
 					this.isRegistered = false;
 					this.canViewAttendees = false;
 					this.cdr.detectChanges();
@@ -127,6 +123,71 @@ export class EventComponent {
 					this.router.navigate(["/logout"]);
 				}
 				console.error("Error leaving event: ", err);
+			},
+		});
+	}
+
+	removeAttendee(attendeeId: string) {
+		this.apiService.removeAttendee(this.title, attendeeId).subscribe({
+			next: (response) => {
+				if (response.error) {
+					console.error("Error removing attendee");
+				} else {
+					this.attendeeIds = this.attendeeIds.filter(
+						(attendee) => attendee._id !== attendeeId
+					);
+					this.cdr.detectChanges();
+				}
+			},
+			error: (err) => {
+				if (err.error.error.includes("Invalid token")) {
+					this.router.navigate(["/logout"]);
+				}
+				console.error("Error removing attendee: ", err);
+			},
+		});
+	}
+
+	removeRequestedAttendee(attendeeId: string) {
+		this.apiService.removeAttendee(this.title, attendeeId).subscribe({
+			next: (response) => {
+				if (response.error) {
+					console.error("Error removing attendee");
+				} else {
+					this.requestedAttendeeIds =
+						this.requestedAttendeeIds.filter(
+							(attendee) => attendee._id !== attendeeId
+						);
+					this.cdr.detectChanges();
+				}
+			},
+			error: (err) => {
+				if (err.error.error.includes("Invalid token")) {
+					this.router.navigate(["/logout"]);
+				}
+				console.error("Error removing attendee: ", err);
+			},
+		});
+	}
+
+	approveAttendee(attendeeId: string) {
+		this.apiService.approveAttendee(this.title, attendeeId).subscribe({
+			next: (response) => {
+				this.attendeeIds = this.attendeeIds.concat(
+					this.requestedAttendeeIds.filter(
+						(attendee) => attendee._id === attendeeId
+					)
+				);
+				this.requestedAttendeeIds = this.requestedAttendeeIds.filter(
+					(attendee) => attendee._id !== attendeeId
+				);
+				this.cdr.detectChanges();
+			},
+			error: (err) => {
+				if (err.error.error.includes("Invalid token")) {
+					this.router.navigate(["/logout"]);
+				}
+				console.error("Error accepting attendee: ", err);
 			},
 		});
 	}

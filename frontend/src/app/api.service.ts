@@ -197,4 +197,31 @@ export class ApiService {
 			this.getAuthHeaders()
 		);
 	}
+
+	hasRequestedToAttend(title: string): Observable<any> {
+		const body = { title };
+		return this.http.post(
+			`${this.apiUrl}has-requested-to-attend`,
+			body,
+			this.getAuthHeaders()
+		);
+	}
+
+	approveAttendee(title: string, attendeeId: string): Observable<any> {
+		const body = { title, attendeeId };
+		return this.http.post(
+			`${this.apiUrl}approve-attendee`,
+			body,
+			this.getAuthHeaders()
+		);
+	}
+
+	removeAttendee(title: string, attendeeId: string): Observable<any> {
+		const body = { title, attendeeId };
+		return this.http.post(
+			`${this.apiUrl}remove-attendee`,
+			body,
+			this.getAuthHeaders()
+		);
+	}
 }
