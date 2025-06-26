@@ -4,3 +4,6 @@ frontend/src/environments
 backend/node_modules
 frontend/node_modules
 schema_summary.json
+backend/.gitignore
+backend/.git
+frontend/dist
