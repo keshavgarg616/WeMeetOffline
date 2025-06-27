@@ -139,15 +139,15 @@
                     No participants yet.</span>
                 }
                 @for (attendee of attendeeIds; track attendee._id) {
-                <div style="display: flex; justify-content: space-between;">
+                <div style="display: flex; justify-content: space-between; height: 30px">
                     <div style="display: flex; align-items: center; gap: 8px; margin-top: 5px;">
                         <img style="border-radius: 50%; height: 20px; width: 20px;" src="{{attendee.pfp}}">
                         <span style="font-size: 14px; width: max-content;">{{ attendee.name }}</span>
                     </div>
-                    <div style="vertical-align: middle; height: 100%">
+                    <div style="vertical-align: middle; height: 80%">
                         @if (isOrganizer) {
-                        <button mat-button color="primary" style="font-size: 1em;"
-                            (click)="removeAttendee(attendee._id)">❌</button>}
+                        <button mat-button color="primary" style="font-size: 1em; height: 100%; margin-top: 8px;"
+                            (click)="removeAttendee(attendee._id)" title="Remove Participant">❌</button>}
                     </div>
                 </div>
                 }
@@ -164,9 +164,13 @@
                         <span style="font-size: 14px; width: max-content;">{{ attendee.name }}</span>
                     </div>
                     <div style="vertical-align: middle; height: 100%">
-                        <button mat-button color="primary" style="font-size: 1em;"
-                            (click)="approveAttendee(attendee._id)">✔️</button> / <button mat-button color="primary"
-                            style="font-size: 1em;" (click)="removeRequestedAttendee(attendee._id)">❌</button>
+                        <button mat-button color="primary" style="font-size: 1.3em;"
+                            (click)="approveAttendee(attendee._id)" title="Accept Request">
+                            <div style="margin-bottom: 10px;">✔️</div>
+                        </button> / <button mat-button color="primary" style="font-size: 1em;"
+                            (click)="removeRequestedAttendee(attendee._id)" title="Remove Request">
+                            <div style="margin-bottom: 6px;">❌</div>
+                        </button>
                     </div>
                 </div>
                 }
