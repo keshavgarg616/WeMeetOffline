@@ -3,6 +3,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { environment } from "../environments/environment";
+import { AppStateService } from "./app-state.service";
 
 @Injectable({
 	providedIn: "root",
@@ -10,17 +11,15 @@ import { environment } from "../environments/environment";
 export class ApiService {
 	private apiUrl: string;
 
-	constructor(private http: HttpClient) {
+	constructor(private http: HttpClient, private appState: AppStateService) {
 		this.apiUrl = environment.BACKEND_URL;
 	}
 
-	private getAuthHeaders() {
-		const token = localStorage.getItem("token");
-		return {
-			headers: new HttpHeaders({
-				Authorization: `${token}`,
-			}),
-		};
+	private getAuthHeaders(): { headers: HttpHeaders } {
+		const token = localStorage.getItem("token") ?? "";
+		const headers = new HttpHeaders().set("Authorization", `${token}`);
+		this.appState.setLoading(true);
+		return { headers };
 	}
 
 	signup(
@@ -30,12 +29,20 @@ export class ApiService {
 		imgUrl: string
 	): Observable<any> {
 		const body = { name, email, password, imgUrl };
-		return this.http.post(`${this.apiUrl}signup`, body);
+		return this.http.post(
+			`${this.apiUrl}signup`,
+			body,
+			this.getAuthHeaders()
+		);
 	}
 
 	login(email: string, password: string): Observable<any> {
 		const body = { email, password };
-		return this.http.post(`${this.apiUrl}login`, body);
+		return this.http.post(
+			`${this.apiUrl}login`,
+			body,
+			this.getAuthHeaders()
+		);
 	}
 
 	verifyEmail(authCode: string): Observable<any> {
@@ -49,12 +56,20 @@ export class ApiService {
 
 	resetPassword(authCode: string, password: string): Observable<any> {
 		const body = { authCode, password };
-		return this.http.post(`${this.apiUrl}reset-password`, body);
+		return this.http.post(
+			`${this.apiUrl}reset-password`,
+			body,
+			this.getAuthHeaders()
+		);
 	}
 
 	requestPasswordReset(email: string): Observable<any> {
 		const body = { email };
-		return this.http.post(`${this.apiUrl}request-password-reset`, body);
+		return this.http.post(
+			`${this.apiUrl}request-password-reset`,
+			body,
+			this.getAuthHeaders()
+		);
 	}
 
 	setPfp(pfp: string): Observable<any> {

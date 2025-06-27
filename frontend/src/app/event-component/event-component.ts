@@ -6,6 +6,7 @@ import { MatButtonModule } from "@angular/material/button";
 import { firstValueFrom } from "rxjs";
 import { User } from "../../interfaces/userInterface";
 import { Event } from "../../interfaces/eventInterface";
+import { AppStateService } from "../app-state.service";
 
 @Component({
 	selector: "app-event-component",
