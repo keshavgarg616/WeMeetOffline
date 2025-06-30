@@ -240,18 +240,30 @@
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div style="flex: 1;">
-                            {{ comment.text }}
+                            <span id="{{comment._id}}CommentTextDiv">{{ comment.text }}</span>
+                            <div id="{{comment._id}}EditCommentDiv" hidden="true" style="margin-top: 5px;">
+                                <div style="text-align: left; margin-left: 0px;">
+                                    <mat-form-field style="margin-left: 0px;">
+                                        <input matInput [(ngModel)]="commentEditText" placeholder="Edit Comment..."
+                                            style="height: min-content;">
+                                    </mat-form-field>
+                                    <button mat-button color="primary"
+                                        (click)="editComment(comment._id, commentEditText)"
+                                        [disabled]="!commentEditText" style="font-size: 1.3em;"
+                                        title="Save changes">✅</button>
+                                </div>
+                            </div>
                         </div>
                         <span style="display: flex; align-items: center; gap: 10px;">
                             <button mat-button color="primary" (click)="showAddReplyInput(comment._id)"
-                                style="font-size: 0.9em;">↪</button>
+                                style="font-size: 0.9em;" title="Add reply">↪</button>
                             @if (isOrganizer || comment.user._id === userId) {
                             @if (comment.user._id === userId) {
-                            <button mat-button color="primary" (click)="editComment(comment._id, 'new text')"
-                                style="font-size: 0.9em;">✏️</button>
+                            <button mat-button color="primary" (click)="showEditCommentInput(comment._id)"
+                                style="font-size: 0.9em;" title="Edit comment">✏️</button>
                             }
                             <button mat-button color="warn" (click)="deleteComment(comment._id)"
-                                style="font-size: 0.9em;">🗑</button>
+                                style="font-size: 0.9em;" title="Delete comment">🗑</button>
                             }
                         </span>
                     </div>
@@ -278,17 +290,32 @@
                             </div>
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <div style="flex: 1;">
-                                    {{ reply.text }}
+                                    <span id="{{comment._id}}{{reply._id}}ReplyTextDiv">{{ reply.text }}</span>
+                                    <div id="{{comment._id}}{{reply._id}}EditReplyDiv" hidden="true"
+                                        style="margin-top: 5px;">
+                                        <div style="text-align: left; margin-left: 0px;">
+                                            <mat-form-field style="margin-left: 0px;">
+                                                <input matInput [(ngModel)]="replyEditText" placeholder="Edit Reply..."
+                                                    style="height: min-content;">
+                                            </mat-form-field>
+                                            <button mat-button color="primary"
+                                                (click)="editReply(comment._id, reply._id, replyEditText)"
+                                                [disabled]="!replyEditText" style="font-size: 1.3em;"
+                                                title="Save changes">✅</button>
+                                        </div>
+                                    </div>
                                 </div>
                                 <span style="display: flex; align-items: center; gap: 10px;">
                                     @if (isOrganizer || reply.user._id === userId) {
                                     @if (reply.user._id === userId) {
                                     <button mat-button color="primary"
-                                        (click)="editReply(comment._id, reply._id, 'new text')"
-                                        style="font-size: 1.1em; width: min-content; height: min-content;">✏️</button>
+                                        (click)="showEditReplyInput(comment._id, reply._id)"
+                                        style="font-size: 1.1em; width: min-content; height: min-content;"
+                                        title="Edit reply">✎</button>
                                     }
                                     <button mat-button color="warn" (click)="deleteReply(comment._id, reply._id)"
-                                        style="font-size: 1.1em; width: min-content; height: min-content;">🗑</button>
+                                        style="font-size: 1.1em; width: min-content; height: min-content;"
+                                        title="Delete reply">🗑</button>
                                     }
                                 </span>
                             </div>
