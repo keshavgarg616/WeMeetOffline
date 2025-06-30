@@ -239,4 +239,88 @@ export class ApiService {
 			this.getAuthHeaders()
 		);
 	}
+
+	addComment(title: string, comment: string): Observable<any> {
+		const body = { title, comment };
+		return this.http.post(
+			`${this.apiUrl}add-comment`,
+			body,
+			this.getAuthHeaders()
+		);
+	}
+
+	addReply(title: string, commentId: string, reply: string): Observable<any> {
+		const body = { title, commentId, reply };
+		return this.http.post(
+			`${this.apiUrl}add-reply`,
+			body,
+			this.getAuthHeaders()
+		);
+	}
+
+	getComments(title: string): Observable<any> {
+		const body = { title };
+		return this.http.post(
+			`${this.apiUrl}get-comments`,
+			body,
+			this.getAuthHeaders()
+		);
+	}
+
+	getUserId(): Observable<any> {
+		return this.http.post(
+			`${this.apiUrl}get-userid`,
+			{},
+			this.getAuthHeaders()
+		);
+	}
+
+	deleteComment(title: string, commentId: string): Observable<any> {
+		const body = { title, commentId };
+		return this.http.post(
+			`${this.apiUrl}delete-comment`,
+			body,
+			this.getAuthHeaders()
+		);
+	}
+
+	deleteReply(
+		title: string,
+		commentId: string,
+		replyId: string
+	): Observable<any> {
+		const body = { title, commentId, replyId };
+		return this.http.post(
+			`${this.apiUrl}delete-reply`,
+			body,
+			this.getAuthHeaders()
+		);
+	}
+
+	editComment(
+		title: string,
+		commentId: string,
+		newText: string
+	): Observable<any> {
+		const body = { title, commentId, newText };
+		return this.http.post(
+			`${this.apiUrl}edit-comment`,
+			body,
+			this.getAuthHeaders()
+		);
+	}
+
+	editReply(
+		title: string,
+		commentId: string,
+		replyId: string,
+		newText: string
+	): Observable<any> {
+		const body = { title, commentId, replyId, newText };
+		return this.http.post(
+			`${this.apiUrl}edit-reply`,
+			body,
+			this.getAuthHeaders()
+		);
+	}
 }
