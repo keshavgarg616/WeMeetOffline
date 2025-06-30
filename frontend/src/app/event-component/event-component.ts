@@ -31,6 +31,8 @@ export class EventComponent {
 	userId: string = "";
 	newCommentText: string = "";
 	replyText: string = "";
+	commentEditText: string = "";
+	replyEditText: string = "";
 
 	constructor(
 		private apiService: ApiService,
@@ -228,6 +230,7 @@ export class EventComponent {
 	addComment(comment: string) {
 		this.apiService.addComment(this.title, comment).subscribe({
 			next: (response) => {
+				this.newCommentText = "";
 				this.comments = response.comments;
 				this.cdr.detectChanges();
 			},
@@ -328,10 +331,65 @@ export class EventComponent {
 				divToHide.hidden = true;
 			}
 		}
-		if (!div) {
-			console.error("Div not found for commentId:", commentId);
-			return;
+		if (div) {
+			div.hidden = !div.hidden;
 		}
-		div.hidden = !div.hidden;
+	}
+
+	showEditCommentInput(commentId: string) {
+		const div = document.getElementById(`${commentId}EditCommentDiv`);
+		const commentTextDiv = document.getElementById(
+			`${commentId}CommentTextDiv`
+		);
+		this.commentEditText = "";
+		for (const comment of this.comments) {
+			const divToHide = document.getElementById(
+				`${comment._id}EditCommentDiv`
+			);
+			const commentTextDivToShow = document.getElementById(
+				`${comment._id}CommentTextDiv`
+			);
+			commentTextDivToShow!.hidden = false;
+			if (divToHide && divToHide.id !== `${commentId}EditCommentDiv`) {
+				divToHide.hidden = true;
+			}
+		}
+		if (div) {
+			div.hidden = !div.hidden;
+			this.commentEditText = commentTextDiv?.textContent || "";
+			commentTextDiv!.hidden = !div.hidden;
+		}
+	}
+
+	showEditReplyInput(commentId: string, replyId: string) {
+		const div = document.getElementById(
+			`${commentId}${replyId}EditReplyDiv`
+		);
+		const replyTextDiv = document.getElementById(
+			`${commentId}${replyId}ReplyTextDiv`
+		);
+		this.replyEditText = "";
+		for (const comment of this.comments) {
+			for (const reply of comment.replies ?? []) {
+				const divToHide = document.getElementById(
+					`${comment._id}${reply._id}EditReplyDiv`
+				);
+				const replyTextDivToShow = document.getElementById(
+					`${comment._id}${reply._id}ReplyTextDiv`
+				);
+				replyTextDivToShow!.hidden = false;
+				if (
+					divToHide &&
+					divToHide.id !== `${commentId}${replyId}EditReplyDiv`
+				) {
+					divToHide.hidden = true;
+				}
+			}
+		}
+		if (div) {
+			div.hidden = !div.hidden;
+			this.replyEditText = replyTextDiv?.textContent || "";
+			replyTextDiv!.hidden = !div.hidden;
+		}
 	}
 }
