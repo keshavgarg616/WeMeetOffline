@@ -115,6 +115,7 @@
                 padding: 15px;
                 border-radius: 20px;
                 box-sizing: border-box;
+                height: min-content;
             ">
                 <span style="font-weight: bold; font-size: 1.15em;">About this event:</span>
                 <br />
@@ -125,7 +126,9 @@
                 background-color: #191C1C;
                 padding: 15px;
                 border-radius: 20px;
-                box-sizing: border-box;">
+                box-sizing: border-box;
+                height: min-content;
+                ">
                 @if (canViewAttendees) {
                 @if (attendeeIds.length === 0 && requestedAttendeeIds.length === 0) {
                 <span style="font-weight: bold; font-size: 1.15em;">
@@ -184,14 +187,127 @@
                 </span>
                 }
             </div>
-        </div>
 
+            <!-- Comments Section -->
+
+            <div style="
+                margin-top: 15px;
+                background-color: #191C1C;
+                padding: 15px;
+                border-radius: 20px;
+                box-sizing: border-box;
+                height: min-content;
+                ">
+                @if (!isOrganizer && !isRegistered) {
+                <span style="font-size: 1.15em; color: #888;">
+                    Register to view comments.
+                </span>
+                } @else if (hasRequestedToAttend) {
+                <span style="font-size: 1.15em; color: #888;">
+                    Waiting for organizer approval to show comments.
+                </span>
+                } @else {
+                <span style="font-weight: bold; font-size: 1.15em;">Comments:</span>
+                <br>
+                @if (comments.length === 0) {
+                <span style="font-size: 1.15em; color: #888;">
+                    No comments yet.
+                </span>
+                }
+                <!-- New Comment Input -->
+                <div style="display: flex; flex-direction: row; align-items: center; gap: 10px; margin-top: 20px;">
+                    <div style="flex: 4.5;">
+                        <mat-form-field style="width: 100%; margin: 0;">
+                            <input matInput [(ngModel)]="newCommentText" placeholder="Add a comment..."
+                                style="height: 12px">
+                        </mat-form-field>
+                    </div>
+                    <div style="flex: 1;">
+                        <button mat-button color="primary" (click)="addComment(newCommentText)"
+                            [disabled]=(!newCommentText) style="width: 100%; font-size: 1em;">
+                            Add Comment
+                        </button>
+                    </div>
+                </div>
+                @if (comments.length !== 0) {
+                @for (comment of comments; track comment) {
+                <div style="margin-top: 10px; padding: 10px; background-color: #2c2f2f; border-radius: 10px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <img src="{{ comment.user.pfp }}" alt="👤"
+                            style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+                        <span style="font-size: 16px; font-weight: bold;">{{ comment.user.name }} {{comment.user._id ===
+                            userId ? '(You)' : ''}}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="flex: 1;">
+                            {{ comment.text }}
+                        </div>
+                        <span style="display: flex; align-items: center; gap: 10px;">
+                            <button mat-button color="primary" (click)="showAddReplyInput(comment._id)"
+                                style="font-size: 0.9em;">↪</button>
+                            @if (isOrganizer || comment.user._id === userId) {
+                            @if (comment.user._id === userId) {
+                            <button mat-button color="primary" (click)="editComment(comment._id, 'new text')"
+                                style="font-size: 0.9em;">✏️</button>
+                            }
+                            <button mat-button color="warn" (click)="deleteComment(comment._id)"
+                                style="font-size: 0.9em;">🗑</button>
+                            }
+                        </span>
+                    </div>
+                    <div id="{{comment._id}}AddReplyDiv" hidden="true" style="margin-left: 35px;">
+                        <span style="justify-content: space-between; display: flex">
+                            <mat-form-field>
+                                <input matInput [(ngModel)]="replyText" placeholder="Add a reply..."
+                                    style="height: min-content;">
+                            </mat-form-field>
+                            <button mat-button color="primary" (click)="addReply(comment._id, replyText)"
+                                [disabled]="!replyText" style="font-size: 0.9em;">Reply</button>
+                            <span style="width: 30%"></span>
+                        </span>
+                    </div>
+                    <div style="margin-left: 35px; font-size: 0.8em; gap: 10px; display: flex; flex-direction: column;">
+                        @for (reply of comment.replies; track reply) {
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <img src="{{ reply.user.pfp }}" alt="👤"
+                                    style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;">
+                                <span style="font-size: 16px; font-weight: bold;">{{ reply.user.name }} {{reply.user._id
+                                    ===
+                                    userId ? '(You)' : ''}}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="flex: 1;">
+                                    {{ reply.text }}
+                                </div>
+                                <span style="display: flex; align-items: center; gap: 10px;">
+                                    @if (isOrganizer || reply.user._id === userId) {
+                                    @if (reply.user._id === userId) {
+                                    <button mat-button color="primary"
+                                        (click)="editReply(comment._id, reply._id, 'new text')"
+                                        style="font-size: 1.1em; width: min-content; height: min-content;">✏️</button>
+                                    }
+                                    <button mat-button color="warn" (click)="deleteReply(comment._id, reply._id)"
+                                        style="font-size: 1.1em; width: min-content; height: min-content;">🗑</button>
+                                    }
+                                </span>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+                }
+                }
+                }
+            </div>
+        </div>
         <div style="
                 flex: 1;
                 background-color: #191C1C;
                 padding: 15px;
                 border-radius: 20px;
                 box-sizing: border-box;
+                height: min-content;
             ">
             <!-- Event Info -->
             <span style="font-weight: bold; font-size: 1.15em;">Event Type:</span><br>
@@ -202,7 +318,8 @@
             @if (isRegistered || isOrganizer) {
             {{address}}
             } @else {
-            <span style="color: #888;">{{!hasRequestedToAttend? 'Register to view this field.' : 'Waiting for organizer
+            <span style="color: #888;">{{!hasRequestedToAttend? 'Register to view this field.' : 'Waiting for
+                organizer
                 approval to show this field.'}}</span>
             }
             <br>

@@ -6,10 +6,13 @@ import { MatButtonModule } from "@angular/material/button";
 import { firstValueFrom } from "rxjs";
 import { User } from "../../interfaces/userInterface";
 import { Event } from "../../interfaces/eventInterface";
+import { Comment } from "../../interfaces/commentInterface";
+import { FormsModule } from "@angular/forms";
+import { MatInputModule } from "@angular/material/input";
 
 @Component({
 	selector: "app-event-component",
-	imports: [CommonModule, MatButtonModule],
+	imports: [CommonModule, MatButtonModule, FormsModule, MatInputModule],
 	templateUrl: "./event-component.html",
 	standalone: true,
 })
@@ -24,6 +27,10 @@ export class EventComponent {
 	requestedAttendeeIds: User[] = [];
 	address: string = "";
 	canViewAttendees: boolean = false;
+	comments: Comment[] = [];
+	userId: string = "";
+	newCommentText: string = "";
+	replyText: string = "";
 
 	constructor(
 		private apiService: ApiService,
@@ -49,6 +56,9 @@ export class EventComponent {
 		}
 
 		try {
+			this.userId =
+				(await firstValueFrom(this.apiService.getUserId())).userId ??
+				"";
 			this.event = await firstValueFrom(
 				this.apiService.getEventByTitle(this.title)
 			);
@@ -78,6 +88,9 @@ export class EventComponent {
 				if (this.isOrganizer) {
 					this.requestedAttendeeIds = res.requestedAttendees;
 				}
+				this.comments = await firstValueFrom(
+					this.apiService.getComments(this.title)
+				);
 			}
 			this.cdr.detectChanges();
 		} catch (err: any) {
@@ -201,11 +214,7 @@ export class EventComponent {
 	deleteEvent() {
 		this.apiService.deleteEvent(this.title).subscribe({
 			next: (response) => {
-				if (response.error) {
-					console.error("Error deleting event");
-				} else {
-					this.router.navigate(["/home"]);
-				}
+				this.router.navigate(["/home"]);
 			},
 			error: (err) => {
 				if (err.error.error.includes("Invalid token")) {
@@ -214,5 +223,115 @@ export class EventComponent {
 				console.error("Error deleting event: ", err);
 			},
 		});
+	}
+
+	addComment(comment: string) {
+		this.apiService.addComment(this.title, comment).subscribe({
+			next: (response) => {
+				this.comments = response.comments;
+				this.cdr.detectChanges();
+			},
+			error: (err) => {
+				if (err.error.error.includes("Invalid token")) {
+					this.router.navigate(["/logout"]);
+				}
+				console.error("Error adding comment: ", err);
+			},
+		});
+	}
+
+	addReply(commentId: string, reply: string) {
+		this.apiService.addReply(this.title, commentId, reply).subscribe({
+			next: (response) => {
+				this.comments = response.comments;
+				this.cdr.detectChanges();
+			},
+			error: (err) => {
+				if (err.error.error.includes("Invalid token")) {
+					this.router.navigate(["/logout"]);
+				}
+				console.error("Error adding reply: ", err);
+			},
+		});
+	}
+
+	editComment(commentId: string, newText: string) {
+		this.apiService.editComment(this.title, commentId, newText).subscribe({
+			next: (response) => {
+				this.comments = response.comments;
+				this.cdr.detectChanges();
+			},
+			error: (err) => {
+				if (err.error.error.includes("Invalid token")) {
+					this.router.navigate(["/logout"]);
+				}
+				console.error("Error adding reply: ", err);
+			},
+		});
+	}
+
+	editReply(commentId: string, replyId: string, newText: string) {
+		this.apiService
+			.editReply(this.title, commentId, replyId, newText)
+			.subscribe({
+				next: (response) => {
+					this.comments = response.comments;
+					this.cdr.detectChanges();
+				},
+				error: (err) => {
+					if (err.error.error.includes("Invalid token")) {
+						this.router.navigate(["/logout"]);
+					}
+					console.error("Error adding reply: ", err);
+				},
+			});
+	}
+
+	deleteComment(commentId: string) {
+		this.apiService.deleteComment(this.title, commentId).subscribe({
+			next: (response) => {
+				this.comments = response.comments;
+				this.cdr.detectChanges();
+			},
+			error: (err) => {
+				if (err.error.error.includes("Invalid token")) {
+					this.router.navigate(["/logout"]);
+				}
+				console.error("Error adding reply: ", err);
+			},
+		});
+	}
+
+	deleteReply(commentId: string, replyId: string) {
+		this.apiService.deleteReply(this.title, commentId, replyId).subscribe({
+			next: (response) => {
+				this.comments = response.comments;
+				this.cdr.detectChanges();
+			},
+			error: (err) => {
+				if (err.error.error.includes("Invalid token")) {
+					this.router.navigate(["/logout"]);
+				}
+				console.error("Error adding reply: ", err);
+			},
+		});
+	}
+
+	showAddReplyInput(commentId: string) {
+		const div = document.getElementById(`${commentId}AddReplyDiv`);
+		this.replyText = "";
+		for (const comment of this.comments) {
+			const divToHide = document.getElementById(
+				`${comment._id}AddReplyDiv`
+			);
+			if (divToHide && divToHide.id !== `${commentId}AddReplyDiv`) {
+				divToHide.hidden = true;
+			}
+		}
+		if (!div) {
+			console.error("Div not found for commentId:", commentId);
+			return;
+		}
+		div.hidden = !div.hidden;
 	}
 }
