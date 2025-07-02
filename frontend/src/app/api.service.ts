@@ -125,6 +125,16 @@ export class ApiService {
 		);
 	}
 
+	fetchEventsByPage(pageIndexedAt1: number, limit: number): Observable<any> {
+		const page = pageIndexedAt1 - 1;
+		const body = { page, limit };
+		return this.http.post(
+			`${this.apiUrl}fetch-events-by-page`,
+			body,
+			this.getAuthHeaders()
+		);
+	}
+
 	deleteEvent(title: string): Observable<any> {
 		const body = { title };
 		return this.http.post(
@@ -320,6 +330,19 @@ export class ApiService {
 		return this.http.post(
 			`${this.apiUrl}edit-reply`,
 			body,
+			this.getAuthHeaders()
+		);
+	}
+
+	searchEvents(
+		searchStr: string,
+		pageIndexedAt1: number,
+		limit: number
+	): Observable<any> {
+		const page = pageIndexedAt1 - 1;
+		return this.http.post(
+			`${this.apiUrl}search-events`,
+			{ searchStr, page, limit },
 			this.getAuthHeaders()
 		);
 	}

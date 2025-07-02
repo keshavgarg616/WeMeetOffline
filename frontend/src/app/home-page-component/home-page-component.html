@@ -6,7 +6,23 @@
 </div>
 
 <div style="text-align: center; width: 85%;margin: 15px auto auto auto;">
+    <div style="width: 40%; margin: auto;">
+        <form [formGroup]="searchForm">
+            <mat-form-field appearance="outline" style="width: 100%;">
+                <mat-label>Search</mat-label>
+                @if (isSearching) {
+                <button mat-icon-button matSuffix (click)="clearSearch()">
+                    <mat-icon>close</mat-icon>
+                </button>
+                }
+                <input matInput formControlName="searchControl">
+            </mat-form-field>
+        </form>
+    </div>
     <h1 style="width: 100%;text-align: left; font-size: 1.5em;">Upcoming events</h1>
+    @if (events.length === 0) {
+    No events found.
+    }
     <div style="align-items: right; display:flex; flex-wrap: wrap; gap: 16px; justify-content: left;">
         @for(item of events; track item.title) {
         <mat-card
@@ -86,6 +102,7 @@
             </span>
         </mat-card>
         }
+        @if (!isSearching) {
         <mat-card
             style="width: calc(25% - 16px); min-width: 200px; max-width: 400px; cursor: pointer; padding: 4px; vertical-align: middle; text-align: center;">
             <a href="/create-event"
@@ -93,5 +110,15 @@
                 +
             </a>
         </mat-card>
+        }
     </div>
+</div>
+<div style="position: absolute; bottom: 40px; text-align: center; width: 100%; left: 0px; gap: 20px">
+    @for (page of pagesArr; track page) {
+    <span style="padding: 20px;">
+        <span (click)="isSearching ? changeSearchPage(page) : changePage(page)" style="cursor: pointer;">
+            <span [style]="page === currentPage ? 'font-weight: bold;' : 'color: #888;'">{{page}}</span>
+        </span>
+    </span>
+    }
 </div>
