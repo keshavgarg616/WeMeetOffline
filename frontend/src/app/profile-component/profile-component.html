@@ -1,0 +1,59 @@
+<div style="position: absolute; top: 15px; right: 15px; text-align: right;">
+    <a href="/home">
+        <br />
+        <button matButton color="warn" style="color: red; font-size: 1.1em; background-color: white;">
+            Go Back
+        </button>
+    </a>
+</div>
+<div style=" min-height: 100vh; padding: 40px; font-family: Arial, sans-serif;">
+    <div style="text-align: center;">
+        <img [src]="userPfp" [alt]="userName" title="{{ userName }}"
+            style="width: 120px; height: 120px; border-radius: 50%; border: 3px solid #555; object-fit: cover;" />
+        <h2 style="margin: 10px 0 0;">{{ userName }}</h2>
+        <p style="color: #bbbbbb; margin-bottom: 30px;">{{ userEmail }}</p>
+    </div>
+
+    <div
+        style="max-width: 800px; margin: auto; background-color: #191C1C; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px #00000050;">
+
+        <!-- Events Created -->
+        <h3 style="border-bottom: 1px solid #333; padding-bottom: 10px;">Events Created</h3>
+        <ng-container *ngIf="createdEvents.length > 0; else noCreated">
+            <div *ngFor="let event of createdEvents" style="display: flex; align-items: center; margin: 10px 0;">
+                <img [src]="event.picture" alt="{{ event.name }}"
+                    style="width: 60px; height: 60px; border-radius: 8px; margin-right: 15px;" />
+                <span>{{ event.name }}</span>
+            </div>
+        </ng-container>
+        <ng-template #noCreated>
+            <p style="color: #888;">No events created.</p>
+        </ng-template>
+
+        <!-- Events Registered -->
+        <h3 style="border-bottom: 1px solid #333; padding-bottom: 10px; margin-top: 30px;">Events Registered</h3>
+        <ng-container *ngIf="registeredEvents.length > 0; else noRegistered">
+            <div *ngFor="let event of registeredEvents" style="display: flex; align-items: center; margin: 10px 0;">
+                <img [src]="event.picture" alt="{{ event.name }}"
+                    style="width: 60px; height: 60px; border-radius: 8px; margin-right: 15px;" />
+                <span>{{ event.name }}</span>
+            </div>
+        </ng-container>
+        <ng-template #noRegistered>
+            <p style="color: #888;">No events registered.</p>
+        </ng-template>
+
+        <!-- Events Requested -->
+        <h3 style="border-bottom: 1px solid #333; padding-bottom: 10px; margin-top: 30px;">Events Requested to Join</h3>
+        <ng-container *ngIf="requestedEvents.length > 0; else noRequested">
+            <div *ngFor="let event of requestedEvents" style="display: flex; align-items: center; margin: 10px 0;">
+                <img [src]="event.picture" alt="{{ event.name }}"
+                    style="width: 60px; height: 60px; border-radius: 8px; margin-right: 15px;" />
+                <span>{{ event.name }}</span>
+            </div>
+        </ng-container>
+        <ng-template #noRequested>
+            <p style="color: #888;">No join requests made.</p>
+        </ng-template>
+    </div>
+</div>

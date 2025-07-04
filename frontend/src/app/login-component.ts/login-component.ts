@@ -6,6 +6,17 @@ import { MatInputModule } from "@angular/material/input";
 import { MatButtonModule } from "@angular/material/button";
 import { ApiService } from "../api.service";
 import { Router } from "@angular/router";
+import { MatIconModule } from "@angular/material/icon";
+import {
+	getAuth,
+	GoogleAuthProvider,
+	inMemoryPersistence,
+	setPersistence,
+	signInWithPopup,
+	signOut,
+} from "firebase/auth";
+import { initializeApp } from "firebase/app";
+import { environment } from "../../environments/environment";
 
 @Component({
 	selector: "login-route",
@@ -17,6 +28,7 @@ import { Router } from "@angular/router";
 		MatFormFieldModule,
 		MatButtonModule,
 		MatInputModule,
+		MatIconModule,
 	],
 })
 export class LoginComponent {
@@ -24,6 +36,8 @@ export class LoginComponent {
 	password: string = "";
 	router: Router;
 	invalidInfo: Array<string> = [];
+	showPassword: boolean = false;
+	auth = getAuth(initializeApp(environment.firebaseConfig));
 
 	constructor(
 		private apiService: ApiService,
@@ -33,6 +47,11 @@ export class LoginComponent {
 		if (localStorage.getItem("token")) {
 			this.router.navigate(["/home"]);
 		}
+		setPersistence(this.auth, inMemoryPersistence);
+	}
+
+	togglePasswordVisibility() {
+		this.showPassword = !this.showPassword;
 	}
 
 	onSubmit(form: any) {
@@ -60,5 +79,27 @@ export class LoginComponent {
 				this.cdr.detectChanges();
 			},
 		});
+	}
+
+	async signInWithGoogle() {
+		const provider = new GoogleAuthProvider();
+		try {
+			const result = await signInWithPopup(this.auth, provider);
+			const user = result.user;
+
+			const idToken = await user.getIdToken();
+			this.apiService.googleLogin(idToken).subscribe({
+				next: (response) => {
+					localStorage.setItem("token", response.token);
+					this.router.navigate(["/home"]);
+				},
+				error: (error) => {
+					console.error("Google login error:", error);
+					this.cdr.detectChanges();
+				},
+			});
+		} catch (error) {
+			console.error("Login error:", error);
+		}
 	}
 }

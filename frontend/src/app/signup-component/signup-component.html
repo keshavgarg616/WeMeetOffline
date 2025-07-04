@@ -19,6 +19,22 @@
         <br>
     </div>
     <form [formGroup]="signUpForm" (ngSubmit)="signUp()">
+        <div style="width: 40%; text-align: left; margin-bottom: 20px; margin-left: auto;">
+            <ng-picker-overlay [apikey]="FILESTACK_API_KEY" (uploadSuccess)="onUploadSuccess($event)">
+                @if (imgUrl) {
+                <img [src]="imgUrl" alt="Profile Picture"
+                    style="cursor: pointer; width: auto; height: 200px; object-fit: cover;" type="button">
+                } @else {
+                <button mat-stroked-button
+                    style="width: max-content; margin-left: -12px; margin-top: -10px; font-size: 1em; color: greenyellow; border-style: dashed; border-radius: 15%; border-width: 2px;"
+                    type="button">Choose Profile Picture</button>
+                }
+            </ng-picker-overlay>
+            @if (imgUrl) {
+            <button matButton color="warn" (click)="removeImage()"
+                style="margin-left: 10px; font-size: 1em; color: red;" type="button">Remove Image</button>
+            }
+        </div>
         <mat-form-field appearance="fill" class="w-full" style="width: 600px;">
             <mat-label>Name</mat-label>
             <input type="text" formControlName="name" matInput required />
@@ -31,7 +47,10 @@
 
         <mat-form-field appearance="fill" class="w-full" style="width: 600px;">
             <mat-label>Password</mat-label>
-            <input type="password" formControlName="pswd" matInput required />
+            <input [type]="showPassword ? 'text' : 'password'" formControlName="pswd" matInput required />
+            <button matSuffix mat-icon-button aria-label="Toggle password visibility"
+                (click)="togglePasswordVisibility()" type="button" style="margin-right: 8px; margin-top: 4px;">
+                <mat-icon>{{ showPassword ? 'visibility' : 'visibility_off' }}</mat-icon></button>
         </mat-form-field>
         <div style="width: 600px; color: red; background-color: #f8d7da; margin: 0 auto;"
             *ngIf="signUpForm.get('pswd')?.errors?.['hasUpperCase']">
@@ -56,22 +75,14 @@
         <br>
         <mat-form-field appearance="fill" class="w-full" style="width: 600px;">
             <mat-label>Confirm Password</mat-label>
-            <input type="password" formControlName="confirmPswd" matInput required />
+            <input [type]="showPassword ? 'text' : 'password'" formControlName="confirmPswd" matInput required />
         </mat-form-field>
-        <div *ngIf="
-	signUpForm.hasError('passwordMismatch') &&
-	signUpForm.get('confirmPswd')?.dirty &&
-	signUpForm.get('confirmPswd')?.touched
-" style="width: 600px; color: red; background-color: #f8d7da; margin: 0 auto;">
+        @if (signUpForm.hasError('passwordMismatch') &&
+        signUpForm.get('confirmPswd')?.dirty) {
+        <div style="width: 600px; color: red; background-color: #f8d7da; margin: 0 auto;">
             Passwords do not match.
-        </div><br>
-        <div style="width: 40%; text-align: left; margin: auto;">
-            <ng-picker-overlay [apikey]="FILESTACK_API_KEY" (uploadSuccess)="onUploadSuccess($event)">
-                <button matButton
-                    style="margin-left: -12px; margin-top: -10px; font-size: 1em; color: greenyellow;">Choose Profile
-                    Picture</button>
-            </ng-picker-overlay>
         </div>
+        }<br>
 
         <button mat-raised-button type="submit" [disabled]="signUpForm.invalid" color="primary">Submit</button><br><br>
         <a mat-button color="accent" style="color: rgb(144, 144, 236)" href="/login">Already have an account? Log In</a>

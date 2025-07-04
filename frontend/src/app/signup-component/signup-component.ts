@@ -15,9 +15,11 @@ import { Router } from "@angular/router";
 import {
 	createPasswordMatchValidator,
 	createPasswordValidator,
-} from "../passwordStrengthValidator";
+} from "../validators/passwordStrengthValidator";
 import { FilestackModule } from "@filestack/angular";
 import { environment } from "../../environments/environment";
+import { MatIconModule } from "@angular/material/icon";
+import { debounceTime } from "rxjs/operators";
 
 @Component({
 	selector: "signup-route",
@@ -31,12 +33,14 @@ import { environment } from "../../environments/environment";
 		MatButtonModule,
 		FilestackModule,
 		MatInputModule,
+		MatIconModule,
 	],
 })
 export class SignUpComponent {
 	router: Router;
 	invalidInfo: Array<string> = [];
-	imgUrl: string = "https://example.com/default-image.jpg";
+	imgUrl: string = "";
+	showPassword: boolean = false;
 	FILESTACK_API_KEY: string = environment.FILESTACK_API_KEY;
 
 	constructor(
@@ -51,6 +55,7 @@ export class SignUpComponent {
 
 	onUploadSuccess(res: any) {
 		this.imgUrl = res.filesUploaded[0].url;
+		this.cdr.detectChanges();
 	}
 
 	signUpForm = new FormGroup(
@@ -71,13 +76,12 @@ export class SignUpComponent {
 			this.invalidInfo = [];
 			const { name, email, pswd } = this.signUpForm.value;
 			let password = pswd?.trim().toString();
+			if (this.imgUrl === "") {
+				this.imgUrl =
+					"https://icrier.org/wp-content/uploads/2022/09/Event-Image-Not-Found.jpg";
+			}
 			this.apiService
-				.signup(
-					name || "",
-					email || "",
-					password || "",
-					this.imgUrl || ""
-				)
+				.signup(name || "", email || "", password || "", this.imgUrl)
 				.subscribe({
 					next: (response) => {
 						this.invalidInfo.push(
@@ -96,5 +100,14 @@ export class SignUpComponent {
 					},
 				});
 		}
+	}
+
+	togglePasswordVisibility() {
+		this.showPassword = !this.showPassword;
+	}
+
+	removeImage() {
+		this.imgUrl = "";
+		this.cdr.detectChanges();
 	}
 }

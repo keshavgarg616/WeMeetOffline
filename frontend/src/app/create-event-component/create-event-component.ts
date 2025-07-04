@@ -13,13 +13,12 @@ import { Router } from "@angular/router";
 import { environment } from "../../environments/environment";
 import { FilestackModule } from "@filestack/angular";
 import { MatButtonModule } from "@angular/material/button";
-import {
-	MatSlideToggle,
-	MatSlideToggleModule,
-} from "@angular/material/slide-toggle";
+import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatTimepickerModule } from "@angular/material/timepicker";
 import { MatDatepickerModule } from "@angular/material/datepicker";
 import { provideNativeDateAdapter } from "@angular/material/core";
+import { endsAfterBegins } from "../validators/dateValidator";
+import { validTagsValidator } from "../validators/tagValidator";
 
 @Component({
 	selector: "app-create-event-component",
@@ -44,22 +43,31 @@ export class CreateEventComponent {
 	endDateAndTime: Date | null = null;
 	router: Router = inject(Router);
 	FILESTACK_API_KEY: string = environment.FILESTACK_API_KEY;
-	imgUrl: string = "https://example.com/default-image.jpg";
+	imgUrl: string = "";
 
-	eventForm: FormGroup = new FormGroup({
-		title: new FormControl("", Validators.required),
-		description: new FormControl("", Validators.required),
-		address: new FormControl("", Validators.required),
-		tags: new FormControl(""),
-		isVirtual: new FormControl(true),
-		startDate: new FormControl("", Validators.required),
-		endDate: new FormControl("", Validators.required),
-		startTime: new FormControl("", Validators.required),
-		endTime: new FormControl("", Validators.required),
-	});
+	eventForm: FormGroup = new FormGroup(
+		{
+			title: new FormControl("", Validators.required),
+			description: new FormControl("", Validators.required),
+			address: new FormControl("", Validators.required),
+			tags: new FormControl("", validTagsValidator()),
+			isVirtual: new FormControl(true),
+			startDate: new FormControl("", Validators.required),
+			endDate: new FormControl("", Validators.required),
+			startTime: new FormControl("", Validators.required),
+			endTime: new FormControl("", Validators.required),
+		},
+		{ validators: endsAfterBegins(), updateOn: "change" }
+	);
 
 	onUploadSuccess(res: any) {
 		this.imgUrl = res.filesUploaded[0].url;
+		this.cdr.detectChanges();
+	}
+
+	removeImage() {
+		this.imgUrl = "";
+		this.cdr.detectChanges();
 	}
 
 	constructor(
@@ -70,18 +78,16 @@ export class CreateEventComponent {
 		this.invalidInfo = [];
 		let tagsArr = [];
 		if (this.eventForm.value.tags !== "") {
-			try {
-				tagsArr = this.eventForm.value.tags
-					.split(",")
-					.map((tag: string) => tag.trim());
-				for (let tag of tagsArr) {
-					if (tag === "") {
-						return console.log("Tags cannot be empty");
-					}
-				}
-			} catch {
-				return console.log("Tags entered wrong");
-			}
+			tagsArr = this.eventForm.value.tags
+				.toString()
+				.trim()
+				.split(",")
+				.map((tag: string) => tag.trim());
+		}
+		if (!this.imgUrl) {
+			this.imgUrl =
+				"https://icrier.org/wp-content/uploads/2022/09/Event-Image-Not-Found.jpg";
+			this.cdr.detectChanges();
 		}
 		this.apiService
 			.addEvent(

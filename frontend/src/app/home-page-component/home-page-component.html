@@ -1,6 +1,10 @@
-<div style="position: absolute; top: 5px; right: 10px;">
+<div style="position: absolute; top: 15px; right: 10px; text-align: right;">
+    <a href="/profile">
+        <img src="{{ userPfp }}" alt="👤" style="height: 45px; width: 45px; border-radius: 50%; cursor: pointer;"
+            title="{{userName}}" />
+    </a>
+    <br>
     <a href="/logout">
-        <br>
         <button matButton color="warn" style="color: red; width: 50px; height: auto; font-size: 1.3em;">Logout</button>
     </a>
 </div>
@@ -24,6 +28,15 @@
     No events found.
     }
     <div style="align-items: right; display:flex; flex-wrap: wrap; gap: 16px; justify-content: left;">
+        @if (!isSearching && currentPage === 1) {
+        <mat-card
+            style="width: calc(25% - 16px); min-width: 200px; max-width: 400px; cursor: pointer; padding: 4px; vertical-align: middle; text-align: center;">
+            <a href="/create-event"
+                style="height: 100%; width: 100%; display: flex; justify-content: center; align-items: center; text-decoration: none; font-size: 200px; color: cyan;">
+                +
+            </a>
+        </mat-card>
+        }
         @for(item of events; track item.title) {
         <mat-card
             style="width: calc(25% - 16px); min-width: 200px; max-width: 400px; cursor: pointer; padding: 4px; vertical-align: center; text-align: center;"
@@ -100,15 +113,6 @@
                 <div style="height: 3px"></div>
                 }
             </span>
-        </mat-card>
-        }
-        @if (!isSearching) {
-        <mat-card
-            style="width: calc(25% - 16px); min-width: 200px; max-width: 400px; cursor: pointer; padding: 4px; vertical-align: middle; text-align: center;">
-            <a href="/create-event"
-                style="height: 100%; width: 100%; display: flex; justify-content: center; align-items: center; text-decoration: none; font-size: 200px; color: cyan;">
-                +
-            </a>
         </mat-card>
         }
     </div>

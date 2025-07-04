@@ -38,6 +38,8 @@ export class HomePageComponent {
 	searchStr: string = "";
 	isSearching: boolean = false;
 	searchForm: FormGroup;
+	userPfp: string = "";
+	userName: string = "";
 
 	ngOnInit(): void {
 		this.searchForm.valueChanges
@@ -61,6 +63,19 @@ export class HomePageComponent {
 			searchControl: new FormControl(""),
 		});
 		this.changePage(1);
+		this.apiService.getUserProfile().subscribe({
+			next: (res) => {
+				this.userPfp = res.pfp;
+				this.userName = res.name;
+				this.cdr.detectChanges();
+			},
+			error: (error) => {
+				if (error.error.error.includes("Invalid token")) {
+					this.router.navigate(["/logout"]);
+				}
+				console.error("Error fetching user profile:", error);
+			},
+		});
 	}
 
 	changePage(page: number) {

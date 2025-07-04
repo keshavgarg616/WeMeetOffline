@@ -22,6 +22,12 @@ export const addEvent = async (req, res) => {
 				.json({ error: "Event with this title already exists" });
 		}
 
+		if (new Date(beginsAt) >= new Date(endsAt)) {
+			return res
+				.status(400)
+				.json({ error: "Event end time must be after start time" });
+		}
+
 		const newEvent = new Event({
 			title,
 			description,

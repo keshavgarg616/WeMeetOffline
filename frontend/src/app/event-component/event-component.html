@@ -1,11 +1,18 @@
 <!-- Go Back Button -->
-<div style="position: absolute; top: 15px; right: 15px;">
+<div style="position: absolute; top: 15px; right: 15px; text-align: right;">
     <a href="/home">
         <br />
         <button matButton color="warn" style="color: red; font-size: 1.1em; background-color: white;">
             Go Back
         </button>
     </a>
+    <div style="color: white; font-weight: bolder; margin-top: 10px;">
+        <button mat-button color="primary" (click)="copyShareLink()" style="height: min-content; width: auto;">
+            <span style="font-size: 1.9em;">➤</span>
+            <br>
+            {{copied ? 'Link copied!' : 'Share Event'}}
+        </button>
+    </div>
 </div>
 
 <!-- Event Banner Image -->
@@ -335,6 +342,7 @@
                 border-radius: 20px;
                 box-sizing: border-box;
                 height: min-content;
+                position: relative;
             ">
             <!-- Event Info -->
             <span style="font-weight: bold; font-size: 1.15em;">Event Type:</span><br>
