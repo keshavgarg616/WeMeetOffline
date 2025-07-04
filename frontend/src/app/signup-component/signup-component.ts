@@ -15,7 +15,7 @@ import { Router } from "@angular/router";
 import {
 	createPasswordMatchValidator,
 	createPasswordValidator,
-} from "../validators/passwordStrengthValidator";
+} from "../../validators/passwordStrengthValidator";
 import { FilestackModule } from "@filestack/angular";
 import { environment } from "../../environments/environment";
 import { MatIconModule } from "@angular/material/icon";

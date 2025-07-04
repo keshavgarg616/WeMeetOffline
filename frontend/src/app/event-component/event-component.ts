@@ -10,10 +10,17 @@ import { Comment } from "../../interfaces/commentInterface";
 import { FormsModule } from "@angular/forms";
 import { MatInputModule } from "@angular/material/input";
 import { Clipboard } from "@angular/cdk/clipboard";
+import { NewLineHTMLPipe } from "../../pipes/newLinePipe";
 
 @Component({
 	selector: "app-event-component",
-	imports: [CommonModule, MatButtonModule, FormsModule, MatInputModule],
+	imports: [
+		CommonModule,
+		MatButtonModule,
+		FormsModule,
+		MatInputModule,
+		NewLineHTMLPipe,
+	],
 	templateUrl: "./event-component.html",
 	standalone: true,
 })

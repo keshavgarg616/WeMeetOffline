@@ -15,7 +15,7 @@ import { Router } from "@angular/router";
 import {
 	createPasswordMatchValidator,
 	createPasswordValidator,
-} from "../validators/passwordStrengthValidator";
+} from "../../validators/passwordStrengthValidator";
 import { MatIconModule } from "@angular/material/icon";
 
 @Component({
