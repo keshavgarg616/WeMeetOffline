@@ -17,8 +17,8 @@ import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatTimepickerModule } from "@angular/material/timepicker";
 import { MatDatepickerModule } from "@angular/material/datepicker";
 import { provideNativeDateAdapter } from "@angular/material/core";
-import { endsAfterBegins } from "../validators/dateValidator";
-import { validTagsValidator } from "../validators/tagValidator";
+import { endsAfterBegins } from "../../validators/dateValidator";
+import { validTagsValidator } from "../../validators/tagValidator";
 
 @Component({
 	selector: "app-create-event-component",

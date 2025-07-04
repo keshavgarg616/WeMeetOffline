@@ -11,7 +11,7 @@ export function validTagsValidator(): ValidatorFn {
 		const startsWithComma = value.startsWith(",");
 		let errorsWhenSplitting = false;
 		try {
-			console.log(value.split(",").map((tag: string) => tag.trim()));
+			value.split(",").map((tag: string) => tag.trim());
 		} catch {
 			errorsWhenSplitting = true;
 		}

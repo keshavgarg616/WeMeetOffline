@@ -126,7 +126,7 @@
             ">
                 <span style="font-weight: bold; font-size: 1.15em;">About this event:</span>
                 <br />
-                {{ event?.description }}
+                <div [innerHTML]="event?.description ?? '' | newLineHTML"></div>
             </div>
             <div style="
                 margin-top: 15px;
