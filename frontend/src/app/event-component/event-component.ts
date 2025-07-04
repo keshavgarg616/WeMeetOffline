@@ -9,6 +9,7 @@ import { Event } from "../../interfaces/eventInterface";
 import { Comment } from "../../interfaces/commentInterface";
 import { FormsModule } from "@angular/forms";
 import { MatInputModule } from "@angular/material/input";
+import { Clipboard } from "@angular/cdk/clipboard";
 
 @Component({
 	selector: "app-event-component",
@@ -27,6 +28,7 @@ export class EventComponent {
 	requestedAttendeeIds: User[] = [];
 	address: string = "";
 	canViewAttendees: boolean = false;
+	copied: boolean = false;
 	comments: Comment[] = [];
 	userId: string = "";
 	newCommentText: string = "";
@@ -36,7 +38,8 @@ export class EventComponent {
 
 	constructor(
 		private apiService: ApiService,
-		private cdr: ChangeDetectorRef
+		private cdr: ChangeDetectorRef,
+		private clipboard: Clipboard
 	) {
 		this.router = inject(Router);
 		this.init();
@@ -391,5 +394,20 @@ export class EventComponent {
 			this.replyEditText = replyTextDiv?.textContent || "";
 			replyTextDiv!.hidden = !div.hidden;
 		}
+	}
+
+	copyShareLink() {
+		this.copied = true;
+		this.cdr.detectChanges();
+		let shareStr =
+			`${window.location.origin}/share/${this.title}`.replaceAll(
+				" ",
+				"%20"
+			);
+		this.clipboard.copy(shareStr);
+		setTimeout(() => {
+			this.copied = false;
+			this.cdr.detectChanges();
+		}, 2000);
 	}
 }

@@ -18,7 +18,6 @@ export class ApiService {
 	private getAuthHeaders(): { headers: HttpHeaders } {
 		const token = localStorage.getItem("token") ?? "";
 		const headers = new HttpHeaders().set("Authorization", `${token}`);
-		this.appState.setLoading(true);
 		return { headers };
 	}
 
@@ -29,47 +28,31 @@ export class ApiService {
 		imgUrl: string
 	): Observable<any> {
 		const body = { name, email, password, imgUrl };
-		return this.http.post(
-			`${this.apiUrl}signup`,
-			body,
-			this.getAuthHeaders()
-		);
+		return this.http.post(`${this.apiUrl}signup`, body);
 	}
 
 	login(email: string, password: string): Observable<any> {
 		const body = { email, password };
-		return this.http.post(
-			`${this.apiUrl}login`,
-			body,
-			this.getAuthHeaders()
-		);
+		return this.http.post(`${this.apiUrl}login`, body);
+	}
+
+	googleLogin(idToken: string): Observable<any> {
+		return this.http.post(`${this.apiUrl}google-login`, { idToken });
 	}
 
 	verifyEmail(authCode: string): Observable<any> {
 		const body = { authCode };
-		return this.http.post(
-			`${this.apiUrl}verify-email-code`,
-			body,
-			this.getAuthHeaders()
-		);
+		return this.http.post(`${this.apiUrl}verify-email-code`, body);
 	}
 
 	resetPassword(authCode: string, password: string): Observable<any> {
 		const body = { authCode, password };
-		return this.http.post(
-			`${this.apiUrl}reset-password`,
-			body,
-			this.getAuthHeaders()
-		);
+		return this.http.post(`${this.apiUrl}reset-password`, body);
 	}
 
 	requestPasswordReset(email: string): Observable<any> {
 		const body = { email };
-		return this.http.post(
-			`${this.apiUrl}request-password-reset`,
-			body,
-			this.getAuthHeaders()
-		);
+		return this.http.post(`${this.apiUrl}request-password-reset`, body);
 	}
 
 	setPfp(pfp: string): Observable<any> {
@@ -83,7 +66,7 @@ export class ApiService {
 
 	getUserProfile(): Observable<any> {
 		return this.http.post(
-			`${this.apiUrl}user-profile`,
+			`${this.apiUrl}get-user-profile`,
 			{},
 			this.getAuthHeaders()
 		);

@@ -7,6 +7,7 @@ import {
 	requestPasswordReset,
 	setPfp,
 	getUserProfile,
+	googleLogin,
 } from "../controllers/userController.js";
 import verifyToken from "../middleware.js";
 const userRouter = Router();
@@ -18,5 +19,6 @@ userRouter.post("/reset-password", resetPassword);
 userRouter.post("/request-password-reset", requestPasswordReset);
 userRouter.post("/set-pfp", verifyToken, setPfp);
 userRouter.post("/get-user-profile", verifyToken, getUserProfile);
+userRouter.post("/google-login", googleLogin);
 
 export default userRouter;

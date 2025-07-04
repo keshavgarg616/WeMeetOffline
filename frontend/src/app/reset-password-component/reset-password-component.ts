@@ -15,7 +15,8 @@ import { Router } from "@angular/router";
 import {
 	createPasswordMatchValidator,
 	createPasswordValidator,
-} from "../passwordStrengthValidator";
+} from "../validators/passwordStrengthValidator";
+import { MatIconModule } from "@angular/material/icon";
 
 @Component({
 	selector: "email-verification-route",
@@ -28,6 +29,7 @@ import {
 		MatFormFieldModule,
 		MatButtonModule,
 		MatInputModule,
+		MatIconModule,
 	],
 })
 export class resetPasswordComponent {
@@ -36,6 +38,7 @@ export class resetPasswordComponent {
 	invalidInfo: Array<string> = [];
 	resetPasswordForm: FormGroup;
 	passwordResetSuccessfully: boolean = false;
+	showPassword: boolean = false;
 
 	constructor(
 		private apiService: ApiService,
@@ -86,5 +89,9 @@ export class resetPasswordComponent {
 					});
 				},
 			});
+	}
+
+	togglePasswordVisibility() {
+		this.showPassword = !this.showPassword;
 	}
 }
