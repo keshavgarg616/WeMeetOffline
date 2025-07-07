@@ -256,22 +256,20 @@ export const requestPasswordReset = async (req, res) => {
 	}
 };
 
-export const setPfp = async (req, res) => {
-	const { pfp } = req.body;
+export const updateUserProfile = async (req, res) => {
+	const { name, pfp } = req.body;
 	const userId = req.userId;
-
 	try {
 		const user = await User.findById(userId);
 		if (!user) {
 			return res.status(404).json({ error: "User not found" });
 		}
+		user.name = name;
 		user.pfp = pfp;
 		await user.save();
-		res.status(200).json({
-			message: "Profile picture updated successfully",
-		});
+		res.status(200).json({ success: true });
 	} catch (error) {
-		console.error("Error updating profile picture:", error);
+		console.error("Error updating user profile:", error);
 		res.status(500).json({ error: "Internal server error" });
 	}
 };

@@ -5,12 +5,58 @@
             Go Back
         </button>
     </a>
+    <br>
+    <div style="margin-top: 7px"></div>
+    <a href="/forgot-password">
+        <button matButton color="warn" style="color: orange; font-size: 1.1em;">
+            Change Password
+        </button>
+    </a>
+    <br>
+    <button matButton color="warn" style="color: green; font-size: 1.1em;" type="button" (click)="editProfile()">
+        Edit Profile
+    </button>
 </div>
 <div style=" min-height: 100vh; padding: 40px; font-family: Arial, sans-serif;">
     <div style="text-align: center;">
-        <img [src]="userPfp" [alt]="userName" title="{{ userName }}"
+        @if (profileEditable) {
+        <div style="width: 120px; height: min-content; margin: auto;">
+            <ng-picker-overlay [apikey]="FILESTACK_API_KEY" (uploadSuccess)="onUploadSuccess($event)">
+                @if (imgUrl) {
+                <img [src]="imgUrl" [alt]="userName" title="{{ userName }}"
+                    style="width: 120px; height: 120px; border-radius: 50%; border: 3px solid #555; object-fit: cover;"
+                    type="button" />
+                } @else {
+                <button mat-stroked-button
+                    style="width: max-content; margin-left: -43px; color: greenyellow; border-style: dashed; border-radius: 15%; border-width: 2px;"
+                    type="button">Choose Profile Picture</button>
+                }
+            </ng-picker-overlay>
+        </div>
+        @if (imgUrl) {
+        <button matButton color="warn" (click)="removeImage()" style="margin-left: 10px; font-size: 1em; color: red;"
+            type="button">Remove Image</button>
+        }
+        } @else {
+        <img [src]="imgUrl" [alt]="userName" title="{{ userName }}"
             style="width: 120px; height: 120px; border-radius: 50%; border: 3px solid #555; object-fit: cover;" />
-        <h2 style="margin: 10px 0 0;">{{ userName }}</h2>
+        }
+
+        <h2 style="margin: 10px 0 0;">
+            <form [formGroup]="profileForm" (ngSubmit)="updateProfile()">
+                @if (profileEditable) {
+                <mat-form-field appearance="fill" style="width: 200px; margin-right: 10px;">
+                    <mat-label>Name</mat-label>
+                    <input matInput formControlName="name" placeholder="Enter your name" />
+                </mat-form-field>
+                <br>
+                <button mat-button color="primary" type="submit"
+                    style="color: yellowgreen; margin-top: -18px;">Save</button>
+                } @else {
+                {{ userName }}
+                }
+            </form>
+        </h2>
         <p style="color: #bbbbbb; margin-bottom: 30px;">{{ userEmail }}</p>
     </div>
 
@@ -31,7 +77,8 @@
         </ng-template>
 
         <!-- Events Registered -->
-        <h3 style="border-bottom: 1px solid #333; padding-bottom: 10px; margin-top: 30px;">Events Registered</h3>
+        <h3 style="border-bottom: 1px solid #333; padding-bottom: 10px; margin-top: 30px;">Events Registered
+        </h3>
         <ng-container *ngIf="registeredEvents.length > 0; else noRegistered">
             <div *ngFor="let event of registeredEvents" style="display: flex; align-items: center; margin: 10px 0;">
                 <img [src]="event.picture" alt="{{ event.name }}"
@@ -44,7 +91,8 @@
         </ng-template>
 
         <!-- Events Requested -->
-        <h3 style="border-bottom: 1px solid #333; padding-bottom: 10px; margin-top: 30px;">Events Requested to Join</h3>
+        <h3 style="border-bottom: 1px solid #333; padding-bottom: 10px; margin-top: 30px;">Events Requested to
+            Join</h3>
         <ng-container *ngIf="requestedEvents.length > 0; else noRequested">
             <div *ngFor="let event of requestedEvents" style="display: flex; align-items: center; margin: 10px 0;">
                 <img [src]="event.picture" alt="{{ event.name }}"

@@ -15,6 +15,11 @@ import { MatDatepickerModule } from "@angular/material/datepicker";
 import { MatTimepickerModule } from "@angular/material/timepicker";
 import { provideNativeDateAdapter } from "@angular/material/core";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
+import { CommonModule } from "@angular/common";
+import { environment } from "../../environments/environment";
+import { FilestackModule } from "@filestack/angular";
+import { validTagsValidator } from "../../validators/tagValidator";
+import { endsAfterBegins } from "../../validators/dateValidator";
 
 @Component({
 	selector: "app-edit-event-component",
@@ -25,6 +30,7 @@ import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 		MatTimepickerModule,
 		ReactiveFormsModule,
 		MatSlideToggleModule,
+		FilestackModule,
 	],
 	providers: [provideNativeDateAdapter()],
 	templateUrl: "./edit-event-component.html",
@@ -40,25 +46,30 @@ export class EditEventComponent {
 	startDateAndTime: Date | null = null;
 	endDateAndTime: Date | null = null;
 	eventUpdated: boolean = false;
+	imgUrl: string = "";
+	FILESTACK_API_KEY: string = environment.FILESTACK_API_KEY;
 
 	constructor(
 		private apiService: ApiService,
 		private cdr: ChangeDetectorRef
 	) {
 		this.init();
-		this.eventForm = new FormGroup({
-			description: new FormControl(
-				this.event?.description,
-				Validators.required
-			),
-			address: new FormControl(this.address, Validators.required),
-			tags: new FormControl(""),
-			isVirtual: new FormControl(true),
-			startDate: new FormControl("", Validators.required),
-			endDate: new FormControl("", Validators.required),
-			startTime: new FormControl("", Validators.required),
-			endTime: new FormControl("", Validators.required),
-		});
+		this.eventForm = new FormGroup(
+			{
+				description: new FormControl(
+					this.event?.description,
+					Validators.required
+				),
+				address: new FormControl(this.address, Validators.required),
+				tags: new FormControl("", validTagsValidator()),
+				isVirtual: new FormControl(true),
+				startDate: new FormControl("", Validators.required),
+				endDate: new FormControl("", Validators.required),
+				startTime: new FormControl("", Validators.required),
+				endTime: new FormControl("", Validators.required),
+			},
+			{ validators: endsAfterBegins(), updateOn: "change" }
+		);
 	}
 
 	async init() {
@@ -108,6 +119,7 @@ export class EditEventComponent {
 		);
 		this.startDateAndTime = this.event?.beginsAt ?? null;
 		this.endDateAndTime = this.event?.endsAt ?? null;
+		this.imgUrl = this.event?.picture ?? "";
 		this.cdr.detectChanges();
 	}
 
@@ -117,22 +129,30 @@ export class EditEventComponent {
 		});
 	}
 
+	onUploadSuccess(res: any) {
+		this.imgUrl = res.filesUploaded[0].url;
+		this.cdr.detectChanges();
+	}
+
+	removeImage() {
+		this.imgUrl = "";
+		this.cdr.detectChanges();
+	}
+
 	onSubmit() {
 		this.invalidInfo = [];
 		let tagsArr = [];
 		if (this.eventForm.value.tags !== "") {
-			try {
-				tagsArr = this.eventForm.value.tags
-					.split(",")
-					.map((tag: string) => tag.trim());
-				for (let tag of tagsArr) {
-					if (tag === "") {
-						return console.log("Tags cannot be empty");
-					}
-				}
-			} catch {
-				return console.log("Tags entered wrong");
-			}
+			tagsArr = this.eventForm.value.tags
+				.toString()
+				.trim()
+				.split(",")
+				.map((tag: string) => tag.trim());
+		}
+		if (!this.imgUrl) {
+			this.imgUrl =
+				"https://icrier.org/wp-content/uploads/2022/09/Event-Image-Not-Found.jpg";
+			this.cdr.detectChanges();
 		}
 		this.apiService
 			.updateEvent(
@@ -142,6 +162,7 @@ export class EditEventComponent {
 				new Date(this.eventForm.value.endTime).getTime().toString(),
 				this.eventForm.value.address,
 				this.eventForm.value.isVirtual,
+				this.imgUrl,
 				tagsArr
 			)
 			.subscribe({
@@ -159,6 +180,9 @@ export class EditEventComponent {
 					if (err.error.error.includes("Invalid token")) {
 						this.router.navigate(["/logout"]);
 					}
+					setTimeout(() => {
+						this.goBack();
+					}, 2000);
 				},
 			});
 	}

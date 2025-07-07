@@ -1,8 +1,8 @@
 <div style="position: absolute; top: 15px; right: 15px;">
     <br>
-    <button matButton color="warn" style="color: red; font-size: 1.1em;" (click)="goBack()">Go Back</button>
+    <button matButton color="warn" style="color: red; font-size: 1.1em;" (click)="goBack()">Cancel</button>
 </div>
-<div style="text-align: center; align-items: center; margin: auto">
+<div style="text-align: left; align-items: left; margin: auto;">
     @if (invalidInfo.length > 0) {
     <div>
         <ul style="
@@ -12,9 +12,8 @@
         background-color: #f8d7da;
         border-radius: 5px;
         padding: 10px;
-        width: 800px;
+        width: 100%;
         margin: 0 auto;
-        text-align: center;
     ">
             @for (message of invalidInfo; track message) {
             <li>{{ message }}</li>
@@ -30,7 +29,7 @@
         background-color: green;
         border-radius: 5px;
         padding: 10px;
-        width: 800px;
+        width: 100%;
         margin: 0 auto;
         text-align: center;
     ">
@@ -38,71 +37,135 @@
         <br>
     </div>
     }
-    <h1>Update Event</h1>
-    <form [formGroup]="eventForm" (ngSubmit)="onSubmit()">
-        <div style="width: fit-content; margin: auto;">
-            Title: {{event?.title}}
-            <br>
-            <mat-form-field appearance="fill" style="width: 600px;">
-                <mat-label>Description</mat-label>
-                <textarea matInput formControlName="description" required></textarea>
-            </mat-form-field>
-            <br>
-            <mat-form-field appearance="fill" style="width: 600px;">
-                <mat-label>{{eventForm.get('isVirtual')?.value ? "Meeting Link" : "Address"}}</mat-label>
-                <input matInput formControlName="address" required>
-            </mat-form-field>
-            <br>
-            <mat-form-field appearance="fill" style="width: 600px;">
-                <mat-label>Tags</mat-label>
-                <input matInput formControlName="tags" placeholder="Tag 1, Tag 2, Tag 3" />
-            </mat-form-field>
-            <br>
-
-            <div style="width: 100%; display: flex; align-items: center;">
-                <mat-form-field style="margin-right: 40px;">
-                    <mat-label>Start date</mat-label>
-                    <input matInput [matDatepicker]="datepicker" formControlName="startDate"
-                        [(ngModel)]="startDateAndTime">
-                    <mat-datepicker #datepicker />
-                    <mat-datepicker-toggle [for]="datepicker" matSuffix />
-                </mat-form-field>
-
-                <mat-form-field>
-                    <mat-label>Start time</mat-label>
-                    <input matInput [matTimepicker]="timepicker" formControlName="startTime"
-                        [(ngModel)]="startDateAndTime">
-                    <mat-timepicker #timepicker />
-                    <mat-timepicker-toggle [for]="timepicker" matSuffix />
-                </mat-form-field>
-            </div>
-
-            <div style="width: 100%; display: flex; align-items: center;">
-                <mat-form-field style="margin-right: 40px;">
-                    <mat-label>End date</mat-label>
-                    <input matInput [matDatepicker]="datepicker_" formControlName="endDate"
-                        [(ngModel)]="endDateAndTime">
-                    <mat-datepicker #datepicker_ />
-                    <mat-datepicker-toggle [for]="datepicker_" matSuffix />
-                </mat-form-field>
-
-                <mat-form-field>
-                    <mat-label>End time</mat-label>
-                    <input matInput [matTimepicker]="timepicker_" formControlName="endTime"
-                        [(ngModel)]="endDateAndTime">
-                    <mat-timepicker #timepicker_ />
-                    <mat-timepicker-toggle [for]="timepicker_" matSuffix />
-                </mat-form-field>
-            </div>
-
-            <div style="width: 100%; text-align: left;">
-                <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
-                    <span>Virtual Event</span>
-                    <mat-slide-toggle formControlName="isVirtual"></mat-slide-toggle>
+    <div style="margin-left: 5%;">
+        <h1 style="font-size: 2.5em; font-weight: bold;">Update Event</h1>
+        <form [formGroup]="eventForm" (ngSubmit)="onSubmit()">
+            <div style="width: 100%;">
+                <span style="font-size: 2em;">
+                    Title: {{event?.title}}
+                </span>
+                <br>
+                <br>
+                <div style="width: min-content; text-align: left; margin-left: 10px;">
+                    <ng-picker-overlay [apikey]="FILESTACK_API_KEY" (uploadSuccess)="onUploadSuccess($event)">
+                        @if (imgUrl) {
+                        <img [src]="imgUrl" alt="Event Banner"
+                            style="cursor: pointer; width: auto; height: 200px; object-fit: cover;" type="button">
+                        } @else {
+                        <button mat-stroked-button
+                            style="width: max-content; margin-left: -12px; margin-top: -10px; font-size: 1em; color: greenyellow; border-style: dashed; border-radius: 15%; border-width: 2px;"
+                            type="button">Choose Event
+                            Banner</button>
+                        }
+                    </ng-picker-overlay>
+                    @if (imgUrl) {
+                    <button matButton color="warn" (click)="removeImage()"
+                        style="margin-left: 10px; font-size: 1em; color: red;" type="button">Remove Image</button>
+                    }
                 </div>
+                <div style="display: flex; width: 100%; gap: 20px;">
+                    <div style="width: 15%; display: flex; justify-content: space-between; align-items: center;">
+                        <span>Virtual Event</span>
+                        <mat-slide-toggle formControlName="isVirtual"></mat-slide-toggle>
+                    </div>
+                    <div style="width: 74%;">
+                        <mat-form-field appearance="fill" style="width: 100%;  margin-bottom: -10px">
+                            <mat-label>Tags</mat-label>
+                            <input matInput formControlName="tags" placeholder="Tag 1, Tag 2, Tag 3" />
+                        </mat-form-field>
+                        @if (eventForm.get('tags')?.errors?.['hasDoubleCommas']) {
+                        <div style="width: 90%; color: #888;">
+                            Double commas are not allowed.
+                        </div>
+                        }
+                        @if (eventForm.get('tags')?.errors?.['errorsWhenSplitting']) {
+                        <div style="width: 90%; color: #888;">
+                            Tags must follow the format 'Tag 1, Tag 2, Tag 3'.
+                        </div>
+                        }
+                        @if (eventForm.get('tags')?.errors?.['startsWithComma']) {
+                        <div style="width: 90%; color: #888;">
+                            Tags list must not start with comma.
+                        </div>
+                        }
+                        @if (eventForm.get('tags')?.errors?.['endsWithComma']) {
+                        <div style="width: 90%; color: #888;">
+                            Tags list must not end with comma.
+                        </div>
+                        }
+                    </div>
+                </div>
+                <br>
+                <mat-form-field appearance="fill" style="width: 90%;">
+                    <mat-label>{{eventForm.get('isVirtual')?.value ? "Meeting Link" : "Address"}}</mat-label>
+                    <input matInput formControlName="address" required>
+                </mat-form-field>
+                @if (eventForm.get('address')?.errors?.['required']) {
+                <div style="width: 90%; color: #888; margin-top: -10px;">
+                    {{eventForm.get('isVirtual')?.value ? "Meeting Link" : "Address"}} is required.
+                </div>
+                }
+                <br>
+                <mat-form-field appearance="fill" style="width: 90%;">
+                    <mat-label>Describe your event</mat-label>
+                    <textarea matInput formControlName="description" required></textarea>
+                </mat-form-field>
+                @if (eventForm.get('description')?.errors?.['required']) {
+                <div style="width: 90%; color: #888; margin-top: -10px;">
+                    Description is required.
+                </div>
+                }
+                <br>
+                <div style="width: 90%; display: flex; height: min-content;">
+                    <div style="width: 40%; display: flex; align-items: center;">
+                        <mat-form-field style="margin-right: 30px;">
+                            <mat-label>Start date</mat-label>
+                            <input matInput [matDatepicker]="datepicker" formControlName="startDate"
+                                [(ngModel)]="startDateAndTime">
+                            <mat-datepicker #datepicker />
+                            <mat-datepicker-toggle [for]="datepicker" matSuffix />
+                        </mat-form-field>
+
+                        <mat-form-field>
+                            <mat-label>Start time</mat-label>
+                            <input matInput [matTimepicker]="timepicker" formControlName="startTime"
+                                [(ngModel)]="startDateAndTime">
+                            <mat-timepicker #timepicker />
+                            <mat-timepicker-toggle [for]="timepicker" matSuffix />
+                        </mat-form-field>
+                    </div>
+                    <div
+                        style="width: 20%; text-align: center; font-size: 40px; margin: auto; font-weight: bold; padding-bottom: 10px;">
+                        -</div>
+                    <div style="width: 40%; display: flex; align-items: center;">
+                        <mat-form-field style="margin-right: 30px;">
+                            <mat-label>End date</mat-label>
+                            <input matInput [matDatepicker]="datepicker_" formControlName="endDate"
+                                [(ngModel)]="endDateAndTime">
+                            <mat-datepicker #datepicker_ />
+                            <mat-datepicker-toggle [for]="datepicker_" matSuffix />
+                        </mat-form-field>
+
+                        <mat-form-field>
+                            <mat-label>End time</mat-label>
+                            <input matInput [matTimepicker]="timepicker_" formControlName="endTime"
+                                [(ngModel)]="endDateAndTime">
+                            <mat-timepicker #timepicker_ />
+                            <mat-timepicker-toggle [for]="timepicker_" matSuffix />
+                        </mat-form-field>
+                    </div>
+                </div>
+                @if (eventForm.hasError('dateError')) {
+                <div style="width: 90%; color: #888; margin-top: -10px;">
+                    Event must end after it begins.
+                </div>
+                }
             </div>
-        </div>
-        <br>
-        <button mat-raised-button color="primary" type="submit" [disabled]="eventForm.invalid">Update Event</button>
-    </form>
+            <br>
+            <div style="width: 90%; text-align: right;">
+                <button mat-flat-button color="primary" type="submit" [disabled]="eventForm.invalid"
+                    style="border-radius: 10%; font-size: 20px;">Update Event</button>
+            </div>
+        </form>
+    </div>
 </div>

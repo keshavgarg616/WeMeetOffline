@@ -55,19 +55,19 @@ export class ApiService {
 		return this.http.post(`${this.apiUrl}request-password-reset`, body);
 	}
 
-	setPfp(pfp: string): Observable<any> {
-		const body = { pfp };
-		return this.http.post(
-			`${this.apiUrl}set-pfp`,
-			body,
-			this.getAuthHeaders()
-		);
-	}
-
 	getUserProfile(): Observable<any> {
 		return this.http.post(
 			`${this.apiUrl}get-user-profile`,
 			{},
+			this.getAuthHeaders()
+		);
+	}
+
+	updateUserProfile(name: string, pfp: string): Observable<any> {
+		const body = { name, pfp };
+		return this.http.post(
+			`${this.apiUrl}update-user-profile`,
+			body,
 			this.getAuthHeaders()
 		);
 	}
@@ -143,6 +143,7 @@ export class ApiService {
 		endsAt: string,
 		address: string,
 		isVirtual: boolean,
+		imgUrl: string,
 		tags: string[]
 	): Observable<any> {
 		const body = {
@@ -152,6 +153,7 @@ export class ApiService {
 			endsAt,
 			address,
 			isVirtual,
+			imgUrl,
 			tags,
 		};
 		return this.http.post(
