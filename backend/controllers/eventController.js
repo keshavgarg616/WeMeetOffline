@@ -42,7 +42,7 @@ export const addEvent = async (req, res) => {
 		});
 
 		await newEvent.save();
-		res.status(201).json({
+		res.status(200).json({
 			message: "Event created successfully",
 			event: newEvent,
 		});
@@ -59,7 +59,7 @@ export const deleteEvent = async (req, res) => {
 	try {
 		const event = await Event.findOne({ title });
 		if (!event) {
-			return res.status(404).json({ error: "Event not found" });
+			return res.status(400).json({ error: "Event not found" });
 		}
 
 		if (event.organizerId.toString() !== userId) {
@@ -83,7 +83,7 @@ export const getEventByTitle = async (req, res) => {
 			{ attendeeIds: 0, address: 0, requestedAttendeeIds: 0 }
 		).populate("organizerId", { name: 1, pfp: 1, _id: 0 });
 		if (!event) {
-			return res.status(401).json({ error: "Event not found" });
+			return res.status(400).json({ error: "Event not found" });
 		}
 		res.status(200).json(event);
 	} catch (error) {
@@ -107,7 +107,7 @@ export const updateEvent = async (req, res) => {
 	try {
 		const event = await Event.findOne({ title });
 		if (!event) {
-			return res.status(404).json({ error: "Event not found" });
+			return res.status(400).json({ error: "Event not found" });
 		}
 		if (event.organizerId.toString() !== userId) {
 			return res.status(403).json({ error: "Unauthorized action" });
@@ -146,11 +146,11 @@ export const registerForEvent = async (req, res) => {
 	try {
 		const event = await Event.findOne({ title });
 		if (!event) {
-			return res.status(404).json({ error: "Event not found" });
+			return res.status(400).json({ error: "Event not found" });
 		}
 		if (event.attendeeIds.includes(userId)) {
 			return res
-				.status(400)
+				.status(403)
 				.json({ error: "Already registered for this event" });
 		}
 		event.requestedAttendeeIds.push(userId);
@@ -171,7 +171,7 @@ export const unregisterFromEvent = async (req, res) => {
 	try {
 		const event = await Event.findOne({ title });
 		if (!event) {
-			return res.status(404).json({ error: "Event not found" });
+			return res.status(400).json({ error: "Event not found" });
 		}
 		if (!event.attendeeIds.includes(userId)) {
 			if (event.requestedAttendeeIds.includes(userId)) {
@@ -184,7 +184,7 @@ export const unregisterFromEvent = async (req, res) => {
 				});
 			} else {
 				return res
-					.status(400)
+					.status(403)
 					.json({ error: "Not registered for this event" });
 			}
 		}
@@ -208,7 +208,7 @@ export const isRegisteredForEvent = async (req, res) => {
 	try {
 		const event = await Event.findOne({ title });
 		if (!event) {
-			return res.status(404).json({ error: "Event not found" });
+			return res.status(400).json({ error: "Event not found" });
 		}
 		const isRegistered = event.attendeeIds.includes(userId);
 		res.status(200).json({ isRegistered });
@@ -225,7 +225,7 @@ export const hasRequestedToAttendEvent = async (req, res) => {
 	try {
 		const event = await Event.findOne({ title });
 		if (!event) {
-			return res.status(404).json({ error: "Event not found" });
+			return res.status(400).json({ error: "Event not found" });
 		}
 		const hasRequested = event.requestedAttendeeIds.includes(userId);
 		res.status(200).json({ hasRequested });
@@ -242,7 +242,7 @@ export const isOrganizerOfEvent = async (req, res) => {
 	try {
 		const event = await Event.findOne({ title });
 		if (!event) {
-			return res.status(404).json({ error: "Event not found" });
+			return res.status(400).json({ error: "Event not found" });
 		}
 		const isOrganizer = event.organizerId.toString() === userId;
 		res.status(200).json({ isOrganizer });
@@ -261,7 +261,7 @@ export const getAddressAndAttendees = async (req, res) => {
 			.populate("attendeeIds", "name pfp")
 			.populate("requestedAttendeeIds", "name pfp");
 		if (!event) {
-			return res.status(404).json({ error: "Event not found" });
+			return res.status(400).json({ error: "Event not found" });
 		}
 		if (event.organizerId.toString() === userId) {
 			return res.status(200).json({
@@ -294,7 +294,7 @@ export const approveAttendee = async (req, res) => {
 	try {
 		const event = await Event.findOne({ title });
 		if (!event) {
-			return res.status(404).json({ error: "Event not found" });
+			return res.status(400).json({ error: "Event not found" });
 		}
 		if (event.organizerId.toString() !== organizerId) {
 			return res.status(403).json({ error: "Unauthorized action" });
@@ -324,7 +324,7 @@ export const removeAttendee = async (req, res) => {
 	try {
 		const event = await Event.findOne({ title });
 		if (!event) {
-			return res.status(404).json({ error: "Event not found" });
+			return res.status(400).json({ error: "Event not found" });
 		}
 		if (event.organizerId.toString() !== organizerId) {
 			return res.status(403).json({ error: "Unauthorized action" });
@@ -361,7 +361,7 @@ export const addComment = async (req, res) => {
 	try {
 		const event = await Event.findOne({ title });
 		if (!event) {
-			return res.status(404).json({ error: "Event not found" });
+			return res.status(400).json({ error: "Event not found" });
 		}
 		if (
 			!event.attendeeIds.includes(userId) &&
@@ -398,11 +398,11 @@ export const addReply = async (req, res) => {
 	try {
 		const event = await Event.findOne({ title });
 		if (!event) {
-			return res.status(404).json({ error: "Event not found" });
+			return res.status(400).json({ error: "Event not found" });
 		}
 		const comment = event.comments.id(commentId);
 		if (!comment) {
-			return res.status(404).json({ error: "Comment not found" });
+			return res.status(400).json({ error: "Comment not found" });
 		}
 		if (
 			!event.attendeeIds.includes(userId) &&
@@ -439,7 +439,7 @@ export const getComments = async (req, res) => {
 			.populate("comments.user", "name pfp")
 			.populate("comments.replies.user", "name pfp");
 		if (!event) {
-			return res.status(404).json({ error: "Event not found" });
+			return res.status(400).json({ error: "Event not found" });
 		}
 		res.status(200).json(event.comments);
 	} catch (error) {
@@ -451,9 +451,6 @@ export const getComments = async (req, res) => {
 export const getUserId = async (req, res) => {
 	try {
 		const userId = req.userId;
-		if (!userId) {
-			return res.status(401).json({ error: "Unauthorized" });
-		}
 		res.status(200).json({ userId });
 	} catch (error) {
 		console.error("Error fetching user ID:", error);
@@ -468,11 +465,11 @@ export const deleteComment = async (req, res) => {
 	try {
 		const event = await Event.findOne({ title });
 		if (!event) {
-			return res.status(404).json({ error: "Event not found" });
+			return res.status(400).json({ error: "Event not found" });
 		}
 		const comment = event.comments.id(commentId);
 		if (!comment) {
-			return res.status(404).json({ error: "Comment not found" });
+			return res.status(400).json({ error: "Comment not found" });
 		}
 		if (
 			comment.user.toString() !== userId &&
@@ -506,15 +503,15 @@ export const deleteReply = async (req, res) => {
 	try {
 		const event = await Event.findOne({ title });
 		if (!event) {
-			return res.status(404).json({ error: "Event not found" });
+			return res.status(400).json({ error: "Event not found" });
 		}
 		const comment = event.comments.id(commentId);
 		if (!comment) {
-			return res.status(404).json({ error: "Comment not found" });
+			return res.status(400).json({ error: "Comment not found" });
 		}
 		const reply = comment.replies.id(replyId);
 		if (!reply) {
-			return res.status(404).json({ error: "Reply not found" });
+			return res.status(400).json({ error: "Reply not found" });
 		}
 		if (
 			reply.user.toString() !== userId &&
@@ -548,11 +545,11 @@ export const editComment = async (req, res) => {
 	try {
 		const event = await Event.findOne({ title });
 		if (!event) {
-			return res.status(404).json({ error: "Event not found" });
+			return res.status(400).json({ error: "Event not found" });
 		}
 		const comment = event.comments.id(commentId);
 		if (!comment) {
-			return res.status(404).json({ error: "Comment not found" });
+			return res.status(400).json({ error: "Comment not found" });
 		}
 		if (comment.user.toString() !== userId) {
 			return res.status(403).json({ error: "Unauthorized action" });
@@ -581,15 +578,15 @@ export const editReply = async (req, res) => {
 	try {
 		const event = await Event.findOne({ title });
 		if (!event) {
-			return res.status(404).json({ error: "Event not found" });
+			return res.status(400).json({ error: "Event not found" });
 		}
 		const comment = event.comments.id(commentId);
 		if (!comment) {
-			return res.status(404).json({ error: "Comment not found" });
+			return res.status(400).json({ error: "Comment not found" });
 		}
 		const reply = comment.replies.id(replyId);
 		if (!reply) {
-			return res.status(404).json({ error: "Reply not found" });
+			return res.status(400).json({ error: "Reply not found" });
 		}
 		if (reply.user.toString() !== userId) {
 			return res.status(403).json({ error: "Unauthorized action" });
@@ -736,7 +733,7 @@ export const getUserStatus = async (req, res) => {
 	try {
 		const event = await Event.findOne({ title });
 		if (!event) {
-			return res.status(404).json({ error: "Event not found" });
+			return res.status(400).json({ error: "Event not found" });
 		}
 		const isRegistered = event.attendeeIds.includes(userId);
 		const hasRequested = event.requestedAttendeeIds.includes(userId);

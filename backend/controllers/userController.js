@@ -35,7 +35,7 @@ export const signUp = async (req, res) => {
 	try {
 		const existingUser = await findByEmail(email);
 		if (existingUser) {
-			return res.status(409).json({ error: "User already exists" });
+			return res.status(400).json({ error: "User already exists" });
 		}
 
 		const newUser = new User({
@@ -57,7 +57,7 @@ export const signUp = async (req, res) => {
 		})();
 		await newUser.save();
 
-		res.status(201).json({
+		res.status(200).json({
 			success: true,
 			message: "User created successfully",
 		});
@@ -94,7 +94,7 @@ export const login = async (req, res) => {
 				return res.status(401).json({ error: "Invalid password" });
 			}
 		} else {
-			return res.status(404).json({ error: "User not found" });
+			return res.status(400).json({ error: "User not found" });
 		}
 	} catch (error) {
 		console.error("Login error:", error);
@@ -144,7 +144,7 @@ export const googleLogin = async (req, res) => {
 			);
 			res.status(200).json({ token });
 		} else {
-			return res.status(401).json({ error: "Email not verified" });
+			return res.status(403).json({ error: "Email not verified" });
 		}
 	} catch (err) {
 		res.status(401).json({ error: "Invalid token" });
@@ -174,10 +174,10 @@ export const verifyEmailCode = async (req, res) => {
 					.status(200)
 					.json({ message: "Email verified successfully" });
 			} else {
-				return res.status(401).json({ error: "Invalid auth code" });
+				return res.status(400).json({ error: "Invalid auth code" });
 			}
 		} else {
-			return res.status(401).json({ error: "Invalid auth code" });
+			return res.status(400).json({ error: "Invalid auth code" });
 		}
 	} catch (error) {
 		res.status(500).json({ error: "Internal server error" });
@@ -197,7 +197,7 @@ export const resetPassword = async (req, res) => {
 		const user = await findByEmail(email);
 		if (user) {
 			if (Date.now() - user.authCodeCreatedAt > 1 * 60 * 1000) {
-				return res.status(400).json({
+				return res.status(401).json({
 					error: "Auth code expired",
 				});
 			}
@@ -211,10 +211,10 @@ export const resetPassword = async (req, res) => {
 					.status(200)
 					.json({ message: "Password Reset Successfully" });
 			} else {
-				return res.status(401).json({ error: "Invalid auth code" });
+				return res.status(400).json({ error: "Invalid auth code" });
 			}
 		} else {
-			return res.status(401).json({ error: "Invalid auth code" });
+			return res.status(400).json({ error: "Invalid auth code" });
 		}
 	} catch (error) {
 		res.status(500).json({ error: "Internal server error" });
@@ -228,7 +228,7 @@ export const requestPasswordReset = async (req, res) => {
 	try {
 		const user = await findByEmail(email);
 		if (!user) {
-			return res.status(404).json({ error: "Email not registered." });
+			return res.status(400).json({ error: "Email not registered." });
 		}
 		let authCode = user.authCode;
 		if (Date.now() - user.authCodeCreatedAt > 1 * 60 * 1000) {
@@ -262,7 +262,7 @@ export const updateUserProfile = async (req, res) => {
 	try {
 		const user = await User.findById(userId);
 		if (!user) {
-			return res.status(404).json({ error: "User not found" });
+			return res.status(400).json({ error: "User not found" });
 		}
 		user.name = name;
 		user.pfp = pfp;
@@ -279,7 +279,7 @@ export const getUserProfile = async (req, res) => {
 	try {
 		const user = await User.findById(userId).select("name pfp authCode");
 		if (!user) {
-			return res.status(404).json({ error: "User not found" });
+			return res.status(400).json({ error: "User not found" });
 		}
 		const email = getEmailFromAuthCode(user.authCode);
 		const eventsRegistered = (await Event.find())
