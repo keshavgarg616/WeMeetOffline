@@ -52,47 +52,6 @@ export const addEvent = async (req, res) => {
 	}
 };
 
-export const getEvents = async (req, res) => {
-	try {
-		const events = await Event.find(
-			{},
-			{ attendeeIds: 0, address: 0, requestedAttendeeIds: 0 }
-		)
-			.populate("organizerId", { name: 1, pfp: 1, _id: 0 })
-			.sort({ beginsAt: 1 }); // Sort by beginning time
-		res.status(200).json(events);
-	} catch (error) {
-		console.error("Error fetching events:", error);
-		res.status(500).json({ error: "Internal server error" });
-	}
-};
-
-export const fetchEventsByPage = async (req, res) => {
-	// pages start at 0
-	const { page, limit } = req.body;
-	try {
-		const total = await Event.countDocuments();
-		const events = await Event.find(
-			{},
-			{ attendeeIds: 0, address: 0, requestedAttendeeIds: 0 }
-		)
-			.populate("organizerId", { name: 1, pfp: 1, _id: 0 })
-			.sort({ beginsAt: 1 })
-			.skip(page * limit)
-			.limit(limit);
-
-		const pages = total / limit + (total % limit ? 1 : 0);
-
-		res.status(200).json({
-			events,
-			pages,
-		});
-	} catch (error) {
-		console.error("Error fetching events:", error);
-		res.status(500).json({ error: "Internal server error" });
-	}
-};
-
 export const deleteEvent = async (req, res) => {
 	const { title } = req.body;
 	const userId = req.userId;
@@ -653,8 +612,59 @@ export const editReply = async (req, res) => {
 };
 
 export const searchEvents = async (req, res) => {
-	const { searchStr, page, limit } = req.body;
+	const { searchStr, page, limit, filterByDateStart, filterByDateEnd } =
+		req.body;
 	const searchTerm = searchStr.toString().trim();
+	if (searchTerm === "") {
+		const events = await Event.aggregate([
+			{
+				$match: {
+					beginsAt: {
+						$gte: new Date(filterByDateStart),
+						$lte: new Date(filterByDateEnd),
+					},
+				},
+			},
+			{
+				$lookup: {
+					from: "users",
+					localField: "organizerId",
+					foreignField: "_id",
+					as: "organizerId",
+				},
+			},
+			{
+				$unwind: "$organizerId",
+			},
+			{
+				$facet: {
+					paginatedResults: [
+						{ $sort: { beginsAt: 1 } },
+						{ $skip: page * limit },
+						{ $limit: limit },
+						{
+							$project: {
+								attendeeIds: 0,
+								address: 0,
+								requestedAttendeeIds: 0,
+								"organizer.email": 0,
+								"organizer.__v": 0,
+							},
+						},
+					],
+					totalCount: [{ $count: "count" }],
+				},
+			},
+		]);
+
+		const paginatedResults = events[0].paginatedResults;
+		const totalCount = events[0].totalCount[0]?.count || 0;
+
+		return res.status(200).json({
+			events: paginatedResults,
+			pages: Math.ceil(totalCount / limit),
+		});
+	}
 
 	try {
 		const results = await Event.aggregate([
@@ -679,6 +689,10 @@ export const searchEvents = async (req, res) => {
 							},
 						},
 					],
+					beginsAt: {
+						$gte: new Date(filterByDateStart),
+						$lte: new Date(filterByDateEnd),
+					},
 				},
 			},
 			{
@@ -711,6 +725,29 @@ export const searchEvents = async (req, res) => {
 		res.status(200).json({ events, pages, total });
 	} catch (error) {
 		console.error("Error searching events:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+};
+
+export const getUserStatus = async (req, res) => {
+	const { title } = req.body;
+	const userId = req.userId;
+
+	try {
+		const event = await Event.findOne({ title });
+		if (!event) {
+			return res.status(404).json({ error: "Event not found" });
+		}
+		const isRegistered = event.attendeeIds.includes(userId);
+		const hasRequested = event.requestedAttendeeIds.includes(userId);
+		const isOrganizer = event.organizerId.toString() === userId;
+		res.status(200).json({
+			isRegistered,
+			hasRequested,
+			isOrganizer,
+		});
+	} catch (error) {
+		console.error("Error fetching user status:", error);
 		res.status(500).json({ error: "Internal server error" });
 	}
 };

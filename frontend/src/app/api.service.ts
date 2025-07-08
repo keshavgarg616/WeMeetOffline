@@ -99,25 +99,6 @@ export class ApiService {
 		);
 	}
 
-	getEvents(): Observable<any> {
-		const body = {};
-		return this.http.post(
-			`${this.apiUrl}get-events`,
-			body,
-			this.getAuthHeaders()
-		);
-	}
-
-	fetchEventsByPage(pageIndexedAt1: number, limit: number): Observable<any> {
-		const page = pageIndexedAt1 - 1;
-		const body = { page, limit };
-		return this.http.post(
-			`${this.apiUrl}fetch-events-by-page`,
-			body,
-			this.getAuthHeaders()
-		);
-	}
-
 	deleteEvent(title: string): Observable<any> {
 		const body = { title };
 		return this.http.post(
@@ -181,19 +162,10 @@ export class ApiService {
 		);
 	}
 
-	isRegisteredForEvent(title: string): Observable<any> {
+	getUserStatus(title: string): Observable<any> {
 		const body = { title };
 		return this.http.post(
-			`${this.apiUrl}is-registered-for-event`,
-			body,
-			this.getAuthHeaders()
-		);
-	}
-
-	isOrganizerOfEvent(title: string): Observable<any> {
-		const body = { title };
-		return this.http.post(
-			`${this.apiUrl}is-organizer-of-event`,
+			`${this.apiUrl}get-user-status`,
 			body,
 			this.getAuthHeaders()
 		);
@@ -203,15 +175,6 @@ export class ApiService {
 		const body = { title };
 		return this.http.post(
 			`${this.apiUrl}get-address-and-attendees`,
-			body,
-			this.getAuthHeaders()
-		);
-	}
-
-	hasRequestedToAttend(title: string): Observable<any> {
-		const body = { title };
-		return this.http.post(
-			`${this.apiUrl}has-requested-to-attend`,
 			body,
 			this.getAuthHeaders()
 		);
@@ -322,12 +285,14 @@ export class ApiService {
 	searchEvents(
 		searchStr: string,
 		pageIndexedAt1: number,
-		limit: number
+		limit: number,
+		filterByDateStart: Date,
+		filterByDateEnd: Date
 	): Observable<any> {
 		const page = pageIndexedAt1 - 1;
 		return this.http.post(
 			`${this.apiUrl}search-events`,
-			{ searchStr, page, limit },
+			{ searchStr, page, limit, filterByDateStart, filterByDateEnd },
 			this.getAuthHeaders()
 		);
 	}

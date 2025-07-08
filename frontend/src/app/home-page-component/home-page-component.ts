@@ -1,22 +1,29 @@
-import { ChangeDetectorRef, Component, inject } from "@angular/core";
+import {
+	ChangeDetectionStrategy,
+	ChangeDetectorRef,
+	Component,
+	inject,
+} from "@angular/core";
 import { ApiService } from "../api.service";
 import { MatCardModule } from "@angular/material/card";
 import { CommonModule } from "@angular/common";
 import { MatButtonModule } from "@angular/material/button";
 import { Router } from "@angular/router";
 import { MatInputModule } from "@angular/material/input";
+import { provideNativeDateAdapter } from "@angular/material/core";
 import {
-	Form,
 	FormControl,
 	FormGroup,
 	FormsModule,
 	ReactiveFormsModule,
 } from "@angular/forms";
-import { debounceTime } from "rxjs/operators";
+import { debounce, debounceTime } from "rxjs/operators";
 import { MatIconModule } from "@angular/material/icon";
+import { MatDatepickerModule } from "@angular/material/datepicker";
 
 @Component({
 	selector: "app-home-page-component",
+	providers: [provideNativeDateAdapter()],
 	imports: [
 		MatCardModule,
 		CommonModule,
@@ -25,6 +32,7 @@ import { MatIconModule } from "@angular/material/icon";
 		FormsModule,
 		ReactiveFormsModule,
 		MatIconModule,
+		MatDatepickerModule,
 	],
 	templateUrl: "./home-page-component.html",
 })
@@ -40,19 +48,40 @@ export class HomePageComponent {
 	searchForm: FormGroup;
 	userPfp: string = "";
 	userName: string = "";
+	beginsAtFilter: Date = new Date(0);
+	endsAtFilter: Date = new Date();
+
+	range = new FormGroup({
+		start: new FormControl<Date | null>(null),
+		end: new FormControl<Date | null>(null),
+	});
 
 	ngOnInit(): void {
 		this.searchForm.valueChanges
 			.pipe(debounceTime(800))
 			.subscribe((searchValue: any) => {
 				this.searchStr = searchValue.searchControl;
-				if (this.searchStr === "") {
-					this.isSearching = false;
-					this.cdr.detectChanges();
-					return this.changePage(1);
-				}
-				this.changeSearchPage(1);
+				this.changePage(1);
 			});
+		this.range.valueChanges.pipe(debounceTime(800)).subscribe(() => {
+			this.beginsAtFilter = this.range.value.start ?? new Date(0);
+			this.endsAtFilter = this.range.value.end ?? new Date();
+			if (
+				this.range.controls.start.hasError("matStartDateInvalid") ||
+				this.range.controls.start.hasError("matDatepickerParse")
+			) {
+				this.beginsAtFilter = new Date(0);
+				console.log("Start date invalid");
+			}
+			if (
+				this.range.controls.end.hasError("matEndDateInvalid") ||
+				this.range.controls.end.hasError("matDatepickerParse")
+			) {
+				this.endsAtFilter = new Date();
+				console.log("End date invalid");
+			}
+			this.changePage(1);
+		});
 	}
 
 	constructor(
@@ -79,8 +108,15 @@ export class HomePageComponent {
 	}
 
 	changePage(page: number) {
+		this.isSearching = this.searchStr !== "";
 		this.apiService
-			.fetchEventsByPage(page, this.eventsRenderLimit)
+			.searchEvents(
+				this.searchStr,
+				page,
+				this.eventsRenderLimit,
+				this.beginsAtFilter,
+				this.endsAtFilter
+			)
 			.subscribe({
 				next: (res) => {
 					this.pagesArr = [];
@@ -108,30 +144,15 @@ export class HomePageComponent {
 		});
 	}
 
-	changeSearchPage(page: number) {
-		this.apiService
-			.searchEvents(this.searchStr, page, this.eventsRenderLimit)
-			.subscribe({
-				next: (res) => {
-					this.isSearching = true;
-					this.pagesArr = [];
-					for (let i = 1; i <= res.pages; i++) {
-						this.pagesArr.push(i);
-					}
-					this.currentPage = page;
-					this.events = res.events;
-					this.cdr.detectChanges();
-				},
-				error: (error) => {
-					if (error.error.error.includes("Invalid token")) {
-						this.router.navigate(["/logout"]);
-					}
-					console.error("Error fetching events:", error);
-				},
-			});
-	}
-
 	clearSearch() {
 		this.searchForm.get("searchControl")?.setValue("");
+	}
+
+	clearStartDate() {
+		this.range.get("start")?.setValue(null);
+	}
+
+	clearEndDate() {
+		this.range.get("end")?.setValue(null);
 	}
 }

@@ -9,19 +9,43 @@
     </a>
 </div>
 
-<div style="text-align: center; width: 85%;margin: 15px auto auto auto;">
-    <div style="width: 40%; margin: auto;">
-        <form [formGroup]="searchForm">
-            <mat-form-field appearance="outline" style="width: 100%;">
-                <mat-label>Search</mat-label>
-                @if (isSearching) {
-                <button mat-icon-button matSuffix (click)="clearSearch()">
-                    <mat-icon>close</mat-icon>
-                </button>
+<div style="text-align: center; width: 85%; margin: 15px auto auto auto;">
+    <div style="width: 60%; margin: auto; display: flex;">
+        <div style="flex: 3;">
+            <form [formGroup]="searchForm">
+                <mat-form-field appearance="outline" style="width: 100%;">
+                    <mat-label>Search</mat-label>
+                    @if (isSearching) {
+                    <button mat-icon-button matSuffix (click)="clearSearch()">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                    }
+                    <input matInput formControlName="searchControl">
+                </mat-form-field>
+            </form>
+        </div>
+        <div style="flex: 0.2;"></div>
+        <div style="flex: 1;">
+            <mat-form-field>
+                <mat-label>Filter by event start</mat-label>
+                <mat-date-range-input [rangePicker]="picker" [formGroup]="range">
+                    <input matStartDate formControlName="start" placeholder="Start date" (click)="clearStartDate()"
+                        title="Click to clear (MM/DD/YYYY)">
+                    <input matEndDate formControlName="end" placeholder="End date" (click)="clearEndDate()"
+                        title="Click to clear (MM/DD/YYYY)">
+                </mat-date-range-input>
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-date-range-picker #picker></mat-date-range-picker>
+                @if (range.controls.start.hasError('matStartDateInvalid') ||
+                range.controls.start.hasError('matDatepickerParse')) {
+                <mat-error>Ignoring invalid start date. </mat-error>
                 }
-                <input matInput formControlName="searchControl">
+                @if (range.controls.end.hasError('matEndDateInvalid') ||
+                range.controls.end.hasError('matDatepickerParse')) {
+                <mat-error>Ignoring invalid end date. </mat-error>
+                }
             </mat-form-field>
-        </form>
+        </div>
     </div>
     <h1 style="width: 100%;text-align: left; font-size: 1.5em;">Upcoming events</h1>
     @if (events.length === 0) {
@@ -120,7 +144,7 @@
 <div style="position: absolute; bottom: 40px; text-align: center; width: 100%; left: 0px; gap: 20px">
     @for (page of pagesArr; track page) {
     <span style="padding: 20px;">
-        <span (click)="isSearching ? changeSearchPage(page) : changePage(page)" style="cursor: pointer;">
+        <span (click)="changePage(page)" style="cursor: pointer;">
             <span [style]="page === currentPage ? 'font-weight: bold;' : 'color: #888;'">{{page}}</span>
         </span>
     </span>

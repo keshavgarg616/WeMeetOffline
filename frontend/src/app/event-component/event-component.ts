@@ -74,21 +74,12 @@ export class EventComponent {
 			this.event = await firstValueFrom(
 				this.apiService.getEventByTitle(this.title)
 			);
-			this.isRegistered = (
-				await firstValueFrom(
-					this.apiService.isRegisteredForEvent(this.title)
-				)
-			).isRegistered;
-			this.isOrganizer = (
-				await firstValueFrom(
-					this.apiService.isOrganizerOfEvent(this.title)
-				)
-			).isOrganizer;
-			this.hasRequestedToAttend = (
-				await firstValueFrom(
-					this.apiService.hasRequestedToAttend(this.title)
-				)
-			).hasRequested;
+			const userStatus = await firstValueFrom(
+				this.apiService.getUserStatus(this.title)
+			);
+			this.isOrganizer = userStatus.isOrganizer;
+			this.isRegistered = userStatus.isRegistered;
+			this.hasRequestedToAttend = userStatus.hasRequested;
 
 			if (this.isRegistered || this.isOrganizer) {
 				const res = await firstValueFrom(

@@ -15,6 +15,6 @@
 </div>
 }
 
-<div [style.display]="isLoading ? 'none' : 'block'">
+<div [style.hidden]="isLoading">
     <router-outlet></router-outlet>
 </div>

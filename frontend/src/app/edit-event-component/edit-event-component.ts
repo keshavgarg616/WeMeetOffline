@@ -96,10 +96,11 @@ export class EditEventComponent {
 		}
 		this.cdr.detectChanges();
 
-		this.isOrganizer = (
-			await firstValueFrom(this.apiService.isOrganizerOfEvent(this.title))
-		).isOrganizer;
-		if (!this.isOrganizer) {
+		const userStatus = await firstValueFrom(
+			this.apiService.getUserStatus(this.title)
+		);
+
+		if (!userStatus.isOrganizer) {
 			return this.goBack();
 		}
 
