@@ -67,6 +67,10 @@ export class SignUpComponent {
 				updateOn: "change",
 			}),
 			confirmPswd: new FormControl("", [Validators.required]),
+			phone: new FormControl("", [
+				Validators.required,
+				Validators.pattern(/^\+?[1-9]\d{1,14}$/),
+			]),
 		},
 		{ validators: createPasswordMatchValidator(), updateOn: "change" }
 	);
@@ -74,14 +78,20 @@ export class SignUpComponent {
 	signUp() {
 		if (this.signUpForm.valid) {
 			this.invalidInfo = [];
-			const { name, email, pswd } = this.signUpForm.value;
+			const { name, email, pswd, phone } = this.signUpForm.value;
 			let password = pswd?.trim().toString();
 			if (this.imgUrl === "") {
 				this.imgUrl =
 					"https://icrier.org/wp-content/uploads/2022/09/Event-Image-Not-Found.jpg";
 			}
 			this.apiService
-				.signup(name || "", email || "", password || "", this.imgUrl)
+				.signup(
+					name || "",
+					email || "",
+					password || "",
+					this.imgUrl,
+					phone || ""
+				)
 				.subscribe({
 					next: (response) => {
 						this.invalidInfo.push(

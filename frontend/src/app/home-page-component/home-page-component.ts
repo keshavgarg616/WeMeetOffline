@@ -17,7 +17,7 @@ import {
 	FormsModule,
 	ReactiveFormsModule,
 } from "@angular/forms";
-import { debounce, debounceTime } from "rxjs/operators";
+import { debounceTime } from "rxjs/operators";
 import { MatIconModule } from "@angular/material/icon";
 import { MatDatepickerModule } from "@angular/material/datepicker";
 
@@ -67,20 +67,18 @@ export class HomePageComponent {
 			this.beginsAtFilter = this.range.value.start ?? new Date(0);
 			this.endsAtFilter = this.range.value.end ?? new Date();
 			if (
+				!this.range.controls.start.value ||
+				!this.range.controls.end.value ||
 				this.range.controls.start.hasError("matStartDateInvalid") ||
-				this.range.controls.start.hasError("matDatepickerParse")
-			) {
-				this.beginsAtFilter = new Date(0);
-				console.log("Start date invalid");
-			}
-			if (
+				this.range.controls.start.hasError("matDatepickerParse") ||
 				this.range.controls.end.hasError("matEndDateInvalid") ||
 				this.range.controls.end.hasError("matDatepickerParse")
 			) {
+				this.beginsAtFilter = new Date(0);
 				this.endsAtFilter = new Date();
-				console.log("End date invalid");
+			} else {
+				this.changePage(1);
 			}
-			this.changePage(1);
 		});
 	}
 

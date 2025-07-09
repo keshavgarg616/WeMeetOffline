@@ -20,7 +20,7 @@ import {
 	searchEvents,
 	getUserStatus,
 } from "../controllers/eventController.js";
-import verifyToken from "../middleware.js";
+import { checkIfPhoneVerified, verifyToken } from "../middleware.js";
 
 const eventRouter = Router();
 
@@ -28,7 +28,12 @@ eventRouter.post("/add-event", verifyToken, addEvent);
 eventRouter.post("/delete-event", verifyToken, deleteEvent);
 eventRouter.post("/get-event-by-title", verifyToken, getEventByTitle);
 eventRouter.post("/update-event", verifyToken, updateEvent);
-eventRouter.post("/register-for-event", verifyToken, registerForEvent);
+eventRouter.post(
+	"/register-for-event",
+	verifyToken,
+	checkIfPhoneVerified,
+	registerForEvent
+);
 eventRouter.post("/unregister-from-event", verifyToken, unregisterFromEvent);
 eventRouter.post("/get-user-status", verifyToken, getUserStatus);
 eventRouter.post(

@@ -7,6 +7,7 @@ import crypto from "crypto";
 import nodemailer from "nodemailer";
 import admin from "firebase-admin";
 import Event from "../schemas/eventSchema.js";
+import twilio from "twilio";
 
 dotenv.config();
 admin.initializeApp({
@@ -28,7 +29,7 @@ const transporter = nodemailer.createTransport({
 });
 
 export const signUp = async (req, res) => {
-	const { name, email, password, imgUrl } = req.body;
+	const { name, email, password, imgUrl, phone } = req.body;
 
 	const authCode = getAuthCode(email);
 
@@ -45,6 +46,7 @@ export const signUp = async (req, res) => {
 			authCode,
 			pfp: imgUrl,
 			isVerified: false,
+			phone,
 		});
 		(async () => {
 			const info = await transporter.sendMail({
@@ -277,7 +279,9 @@ export const updateUserProfile = async (req, res) => {
 export const getUserProfile = async (req, res) => {
 	const userId = req.userId;
 	try {
-		const user = await User.findById(userId).select("name pfp authCode");
+		const user = await User.findById(userId).select(
+			"name pfp phone authCode isPhoneVerified"
+		);
 		if (!user) {
 			return res.status(400).json({ error: "User not found" });
 		}
@@ -306,6 +310,8 @@ export const getUserProfile = async (req, res) => {
 		res.status(200).json({
 			name: user.name,
 			pfp: user.pfp,
+			phone: user.phone,
+			isPhoneVerified: user.isPhoneVerified,
 			email,
 			eventsCreated,
 			eventsRegistered,
@@ -313,6 +319,72 @@ export const getUserProfile = async (req, res) => {
 		});
 	} catch (error) {
 		console.error("Error fetching user profile:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+};
+
+export const requestOTP = async (req, res) => {
+	const userId = req.userId;
+
+	try {
+		const user = await User.findById(userId);
+		if (!user) {
+			return res.status(400).json({ error: "User not found" });
+		}
+		if (user.isPhoneVerified) {
+			return res.status(400).json({ error: "Phone already verified" });
+		}
+
+		const phone = user.phone;
+		const otp = Math.floor(Math.random() * 1000000);
+		user.phoneOTP = otp;
+		await user.save();
+
+		const client = twilio(
+			process.env.TWILIO_ACCOUNT_SID,
+			process.env.TWILIO_AUTH_TOKEN
+		);
+		await client.messages.create({
+			body: `Your OTP for We Meet Offline is ${otp}`,
+			from: process.env.TWILIO_PHONE_NUMBER,
+			to: phone,
+		});
+
+		res.status(200).json({
+			success: true,
+			message: "OTP sent successfully",
+		});
+	} catch (error) {
+		console.error("Error requesting OTP:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+};
+
+export const verifyOTP = async (req, res) => {
+	const { otp } = req.body;
+	const userId = req.userId;
+
+	try {
+		const user = await User.findById(userId);
+		if (!user) {
+			return res.status(400).json({ error: "User not found" });
+		}
+		if (user.isPhoneVerified) {
+			return res.status(400).json({ error: "Phone already verified" });
+		}
+		if (user.phoneOTP === otp) {
+			user.isPhoneVerified = true;
+			user.phoneOTP = "";
+			await user.save();
+			res.status(200).json({
+				success: true,
+				message: "Phone verified successfully",
+			});
+		} else {
+			res.status(400).json({ error: "Invalid OTP" });
+		}
+	} catch (error) {
+		console.error("Error verifying OTP:", error);
 		res.status(500).json({ error: "Internal server error" });
 	}
 };

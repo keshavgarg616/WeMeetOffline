@@ -46,6 +46,11 @@
         </mat-form-field><br>
 
         <mat-form-field appearance="fill" class="w-full" style="width: 600px;">
+            <mat-label>Phone Number</mat-label>
+            <input type="text" formControlName="phone" matInput required />
+        </mat-form-field><br>
+
+        <mat-form-field appearance="fill" class="w-full" style="width: 600px;">
             <mat-label>Password</mat-label>
             <input [type]="showPassword ? 'text' : 'password'" formControlName="pswd" matInput required />
             <button matSuffix mat-icon-button aria-label="Toggle password visibility"

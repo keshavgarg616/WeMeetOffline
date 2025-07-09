@@ -117,6 +117,12 @@ export class EventComponent {
 				if (err.error.error.includes("Invalid token")) {
 					this.router.navigate(["/logout"]);
 				}
+				if (err.error.error.includes("Phone number not verified")) {
+					alert(
+						"Please verify your phone number before registering for events."
+					);
+					return;
+				}
 				console.error("Error registering for event: ", err);
 			},
 		});

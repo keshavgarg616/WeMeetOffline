@@ -25,9 +25,10 @@ export class ApiService {
 		name: string,
 		email: string,
 		password: string,
-		imgUrl: string
+		imgUrl: string,
+		phone: string
 	): Observable<any> {
-		const body = { name, email, password, imgUrl };
+		const body = { name, email, password, imgUrl, phone };
 		return this.http.post(`${this.apiUrl}signup`, body);
 	}
 
@@ -293,6 +294,23 @@ export class ApiService {
 		return this.http.post(
 			`${this.apiUrl}search-events`,
 			{ searchStr, page, limit, filterByDateStart, filterByDateEnd },
+			this.getAuthHeaders()
+		);
+	}
+
+	requestOTP(): Observable<any> {
+		return this.http.post(
+			`${this.apiUrl}request-otp`,
+			{},
+			this.getAuthHeaders()
+		);
+	}
+
+	verifyOTP(otp: string): Observable<any> {
+		const body = { otp };
+		return this.http.post(
+			`${this.apiUrl}verify-otp`,
+			body,
 			this.getAuthHeaders()
 		);
 	}

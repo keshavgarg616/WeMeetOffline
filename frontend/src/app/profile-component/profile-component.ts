@@ -30,6 +30,7 @@ export class ProfileComponent {
 	userName: string = "";
 	userPfp: string = "";
 	userEmail: string = "";
+	userPhone: string = "";
 	createdEvents: Array<profileEventsData> = [];
 	registeredEvents: Array<profileEventsData> = [];
 	requestedEvents: Array<profileEventsData> = [];
@@ -37,6 +38,8 @@ export class ProfileComponent {
 	profileEditable: boolean = false;
 	profileForm: FormGroup;
 	showUpdateBanner: boolean = false;
+	verifyingPhone: boolean = false;
+	isPhoneVerified: boolean = false;
 	imgUrl: string = "";
 	originalPfp: string = "";
 	FILESTACK_API_KEY = environment.FILESTACK_API_KEY;
@@ -87,6 +90,38 @@ export class ProfileComponent {
 			});
 	}
 
+	requestOTP() {
+		this.apiService.requestOTP().subscribe({
+			next: (response) => {
+				this.verifyingPhone = true;
+				this.verifyOTP();
+			},
+			error: (error) => {
+				console.error("Error requesting OTP:", error);
+			},
+		});
+	}
+
+	verifyOTP() {
+		const otp = prompt("Please enter the OTP sent to your phone:");
+		if (!otp) {
+			alert("OTP is required to verify your phone number.");
+			return;
+		}
+		this.apiService.verifyOTP(otp).subscribe({
+			next: (response) => {
+				alert("Phone number verified successfully.");
+				this.verifyingPhone = false;
+				this.isPhoneVerified = true;
+			},
+			error: (error) => {
+				console.error("Error verifying OTP:", error);
+				this.verifyingPhone = false;
+				alert("Failed to verify OTP. Please try again.");
+			},
+		});
+	}
+
 	constructor(
 		private apiService: ApiService,
 		private cdr: ChangeDetectorRef
@@ -99,6 +134,8 @@ export class ProfileComponent {
 				this.userName = response.name;
 				this.userEmail = response.email;
 				this.originalPfp = response.pfp;
+				this.userPhone = response.phone;
+				this.isPhoneVerified = response.isPhoneVerified || false;
 
 				this.createdEvents = response.eventsCreated || [];
 				this.registeredEvents = response.eventsRegistered || [];

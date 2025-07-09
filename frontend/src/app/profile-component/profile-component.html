@@ -57,7 +57,16 @@
                 }
             </form>
         </h2>
-        <p style="color: #bbbbbb; margin-bottom: 30px;">{{ userEmail }}</p>
+        <p style="color: #bbbbbb;">{{ userEmail }}</p>
+        <p style=" color: #bbbbbb; margin-bottom: 30px;">{{ userPhone }}
+            @if (!isPhoneVerified) {
+            @if (!verifyingPhone) {
+            <br>
+            <button mat-raised-button type="button" (click)="requestOTP()">Verify Phone</button>
+            }} @else {
+            <span style="background-color: green; border-radius: 5%; text: yellowgreen;">✅ Verified</span>
+            }
+        </p>
     </div>
 
     <div
