@@ -37,8 +37,8 @@ export class ApiService {
 		return this.http.post(`${this.apiUrl}login`, body);
 	}
 
-	googleLogin(idToken: string): Observable<any> {
-		return this.http.post(`${this.apiUrl}google-login`, { idToken });
+	firebaseLogin(idToken: string): Observable<any> {
+		return this.http.post(`${this.apiUrl}firebase-login`, { idToken });
 	}
 
 	verifyEmail(authCode: string): Observable<any> {

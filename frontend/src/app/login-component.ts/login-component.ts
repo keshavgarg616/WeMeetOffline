@@ -10,10 +10,13 @@ import { MatIconModule } from "@angular/material/icon";
 import {
 	getAuth,
 	GoogleAuthProvider,
+	GithubAuthProvider,
 	inMemoryPersistence,
 	setPersistence,
 	signInWithPopup,
-	signOut,
+	User,
+	fetchSignInMethodsForEmail,
+	linkWithCredential,
 } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { environment } from "../../environments/environment";
@@ -86,9 +89,9 @@ export class LoginComponent {
 		try {
 			const result = await signInWithPopup(this.auth, provider);
 			const user = result.user;
-
 			const idToken = await user.getIdToken();
-			this.apiService.googleLogin(idToken).subscribe({
+
+			this.apiService.firebaseLogin(idToken).subscribe({
 				next: (response) => {
 					localStorage.setItem("token", response.token);
 					this.router.navigate(["/home"]);
@@ -98,8 +101,97 @@ export class LoginComponent {
 					this.cdr.detectChanges();
 				},
 			});
-		} catch (error) {
+		} catch (error: any) {
+			if (
+				error.code === "auth/account-exists-with-different-credential"
+			) {
+				const pendingCred =
+					GoogleAuthProvider.credentialFromError(error);
+				const email = error.customData.email;
+				const methods = await fetchSignInMethodsForEmail(
+					this.auth,
+					email
+				);
+
+				alert(
+					"An account already exists with the same email address. Link your Google account to your existing account."
+				);
+
+				const githubProvider = new GithubAuthProvider();
+				const githubResult = await signInWithPopup(
+					this.auth,
+					githubProvider
+				);
+
+				await linkWithCredential(githubResult.user, pendingCred!);
+				const idToken = await githubResult.user.getIdToken();
+				this.apiService.firebaseLogin(idToken).subscribe({
+					next: (response) => {
+						localStorage.setItem("token", response.token);
+						this.router.navigate(["/home"]);
+					},
+					error: (error) => {
+						console.error("Google login error:", error);
+						this.cdr.detectChanges();
+					},
+				});
+			}
 			console.error("Login error:", error);
+		}
+	}
+
+	async signInWithGithub() {
+		const provider = new GithubAuthProvider();
+		try {
+			const result = await signInWithPopup(this.auth, provider);
+			const user = result.user;
+
+			const idToken = await user.getIdToken();
+			this.apiService.firebaseLogin(idToken).subscribe({
+				next: (response) => {
+					localStorage.setItem("token", response.token);
+					this.router.navigate(["/home"]);
+				},
+				error: (error) => {
+					console.error("Google login error:", error);
+					this.cdr.detectChanges();
+				},
+			});
+		} catch (error: any) {
+			if (
+				error.code === "auth/account-exists-with-different-credential"
+			) {
+				const pendingCred =
+					GithubAuthProvider.credentialFromError(error);
+				const email = error.customData.email;
+				const methods = await fetchSignInMethodsForEmail(
+					this.auth,
+					email
+				);
+
+				alert(
+					"An account already exists with the same email address. Link your GitHub account to your existing account."
+				);
+
+				const googleProvider = new GoogleAuthProvider();
+				const googleResult = await signInWithPopup(
+					this.auth,
+					googleProvider
+				);
+
+				await linkWithCredential(googleResult.user, pendingCred!);
+				const idToken = await googleResult.user.getIdToken();
+				this.apiService.firebaseLogin(idToken).subscribe({
+					next: (response) => {
+						localStorage.setItem("token", response.token);
+						this.router.navigate(["/home"]);
+					},
+					error: (error) => {
+						console.error("Google login error:", error);
+						this.cdr.detectChanges();
+					},
+				});
+			}
 		}
 	}
 }

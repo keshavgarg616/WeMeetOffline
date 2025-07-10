@@ -67,15 +67,27 @@
                 </a>
             </div>
         </form>
-        <button mat-raised-button color="primary" (click)="signInWithGoogle()"
-            style="color: rgb(144, 144, 236); margin-top: 20px; width: 35%; height: 40px;" type="button">
-            <div style="display: flex; vertical-align: middle; margin-right: 8px;">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-                    style="height: 20px; width: auto; margin-right: 7px;">
-                <span style="margin-top: 2px;">
-                    Sign In with Google
-                </span>
-            </div>
-        </button>
+        <div style="display: flex; gap: 40px; margin: auto; justify-content: center;">
+            <button mat-raised-button color="primary" (click)="signInWithGoogle()"
+                style="color: rgb(144, 144, 236); margin-top: 20px; width: 35%; height: 40px;" type="button">
+                <div style="display: flex; vertical-align: middle; margin-right: 8px;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+                        style="height: 20px; width: auto; margin-right: 7px;">
+                    <span style="margin-top: 2px;">
+                        Sign In with Google
+                    </span>
+                </div>
+            </button>
+            <button mat-raised-button color="primary" (click)="signInWithGithub()"
+                style="color: rgb(144, 144, 236); margin-top: 20px; width: 35%; height: 40px;" type="button">
+                <div style="display: flex; vertical-align: middle; margin-right: 8px;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Github_logo_svg.svg"
+                        style="height: 20px; width: auto; margin-right: 7px;">
+                    <span style="margin-top: 2px;">
+                        Sign In with Github
+                    </span>
+                </div>
+            </button>
+        </div>
     </div>
 </div>
