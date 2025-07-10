@@ -9,13 +9,14 @@ Available at https://wemeetoffline.web.app/
 -   **Frontend**: Angular 20
 -   **Backend**: Node.js, Express.js
 -   **Database**: MongoDB Atlas
--   **Authentication**: JWT
+-   **Authentication**: JWT, Firebase
 -   **Email Services**: Nodemailer with SMTP
+-   **SMS Services**: Twilio
 -   **File Upload**: Filestack
 
 ## 🚀 Features
 
--   🔐 User authentication (signup/login/reset/verify)
+-   🔐 User authentication (signup/login/reset/verify) (Google/Github login available)
 -   🗓️ Event creation with time, tags, and banner image
 -   🎫 Event registration and withdrawal
 -   🧑‍🤝‍🧑 Participant visibility for registered users
@@ -46,28 +47,38 @@ WeMeetOffline/
 Create a `.env` file inside the `backend/` directory with the following:
 
 ```dotenv
+# MongoDB Configuration
 MongoDBUsername=yourMongoUsername
 MongoDBPswd=yourMongoPassword
-MongoDBClusterString=yourMongoClusterURL
-SALT_WORK_FACTOR=yourSaltWorkFactor
+MongoDBClusterString=cluster0.xxxxxx
 
-EMAIL_HASH_SECRET=yourEmailHashSecret
+# Security Settings
+SALT_WORK_FACTOR=yourSaltWorkFactor          # Used for password hashing
+EMAIL_HASH_SECRET=yourEmailHashSecret        # Used to encrypt email addresses
+ENCRYPTION_ALGORITHM=aes-256-cbc             # Used for auth code encryption
+ENCRYPTION_KEY=your32ByteEncryptionKey       # Must be 32 bytes
+ENCRYPTION_IV=your16ByteEncryptionIV         # Must be 16 bytes
+JWT_SECRET=yourJWTSecretKey                  # Used to sign JWTs
 
-# Encryption for passwords/tokens
-ENCRYPTION_ALGORITHM=AES-256-CBC
-ENCRYPTION_KEY=your32CharEncryptionKey
-ENCRYPTION_IV=your16CharIV
-
-JWT_SECRET=yourJWTSecret
-
-# SMTP Email Setup
+# Email Configuration
 EMAIL_USER=yourEmail@example.com
 EMAIL_PASS=yourEmailPassword
-EMAIL_NAME=yourEmailName
+EMAIL_NAME=YourAppName
 EMAIL_SMTP_HOST=smtp.example.com
 EMAIL_SMTP_PORT=587
 
-FRONTEND_URL=http://localhost:4200
+# Frontend URL
+FRONTEND_URL=https://your-frontend-url.com
+
+# Firebase Admin SDK Configuration
+FIREBASE_PROJECT_ID=your-firebase-project-id
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk@example.iam.gserviceaccount.com
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+
+# Twilio Configuration
+TWILIO_ACCOUNT_SID=yourTwilioSID
+TWILIO_AUTH_TOKEN=yourTwilioAuthToken
+TWILIO_PHONE_NUMBER=+1234567890
 ```
 
 ## 🌐 Frontend Configuration (environment.ts)
@@ -76,8 +87,16 @@ In `frontend/src/environments/environment.ts`, configure your environment like s
 
 ```ts
 export const environment = {
-	BACKEND_URL: "http://localhost:3000",
-	FILESTACK_API_KEY: "your-filestack-api-key",
+	BACKEND_URL: "https://your-backend-url.com",
+	FILESTACK_API_KEY: "yourFilestackApiKey",
+	firebaseConfig: {
+		apiKey: "yourFirebaseApiKey",
+		authDomain: "your-app.firebaseapp.com",
+		projectId: "yourFirebaseProjectId",
+		storageBucket: "your-app.appspot.com",
+		messagingSenderId: "yourSenderId",
+		appId: "yourAppId",
+	},
 };
 ```
 
@@ -97,7 +116,7 @@ Ensure your MongoDB cluster is online and `.env` is properly filled.
 
 ```bash
 cd frontend
-npm install
+npm install --legacy-peer-deps
 npm start
 ```
 
@@ -105,8 +124,17 @@ Visit: `http://localhost:4200`
 
 ## 📸 Screenshots
 
-TO_DO
+-   Login
+    ![Login](Screenshots/image.png)
+-   Sign Up
+    ![Sign Up](Screenshots/image-1.png)
+-   Home
+    ![Home](Screenshots/image-2.png)
+-   Event Page
+    ![Event](Screenshots/image-3.png)
+-   User Profile
+    ![Profile](Screenshots/profile.png)
 
 ## 📬 Contact
 
-Made with ❤️ by [@keshavgarg616](https://github.com/keshavgarg616)
+Made with ❤️ by [Keshav Garg](https://github.com/keshavgarg616)
