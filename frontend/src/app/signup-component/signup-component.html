@@ -1,7 +1,5 @@
-<div style="text-align: center; margin-top: 40px;">
-    <h2>Sign Up</h2>
-    <div *ngIf="invalidInfo.length > 0">
-        <ul style="
+<div *ngIf="invalidInfo.length > 0">
+    <ul style="
         list-style-type: none;
         color: red;
         font-weight: bold;
@@ -11,85 +9,94 @@
         width: 800px;
         margin: 0 auto;
         text-align: center;
-    ">
-            <div *ngFor="let message of invalidInfo">
-                <li>{{ message }}</li>
-            </div>
-        </ul>
-        <br>
+        ">
+        <div *ngFor="let message of invalidInfo">
+            <li>{{ message }}</li>
+        </div>
+    </ul>
+    <br>
+</div>
+<div style="display: flex; height: 100vh;">
+    <div style="flex: 4">
+        <img src="signup-banner.png" style="width: 100%; height: 100%; object-fit: cover;">
     </div>
-    <form [formGroup]="signUpForm" (ngSubmit)="signUp()">
-        <div style="width: 40%; text-align: left; margin-bottom: 20px; margin-left: auto;">
-            <ng-picker-overlay [apikey]="FILESTACK_API_KEY" (uploadSuccess)="onUploadSuccess($event)">
+    <div style="flex: 1.4; text-align: center; padding: 1.3%;">
+        <form [formGroup]="signUpForm" (ngSubmit)="signUp()">
+            <h1 style="font-weight: bold; font-size: 4.5em;">Sign Up</h1>
+            <div style="width: 40%; margin-bottom: 5%;">
+                <ng-picker-overlay [apikey]="FILESTACK_API_KEY" (uploadSuccess)="onUploadSuccess($event)">
+                    @if (imgUrl) {
+                    <img [src]="imgUrl" alt="Profile Picture"
+                        style="cursor: pointer; width: auto; height: 15%; object-fit: cover;" type="button">
+                    } @else {
+                    <button mat-stroked-button
+                        style="width: max-content; font-size: 1em; color: greenyellow; border-style: dashed; border-radius: 15%; border-width: 2px;"
+                        type="button">Choose Profile Picture</button>
+                    }
+                </ng-picker-overlay>
                 @if (imgUrl) {
-                <img [src]="imgUrl" alt="Profile Picture"
-                    style="cursor: pointer; width: auto; height: 200px; object-fit: cover;" type="button">
-                } @else {
-                <button mat-stroked-button
-                    style="width: max-content; margin-left: -12px; margin-top: -10px; font-size: 1em; color: greenyellow; border-style: dashed; border-radius: 15%; border-width: 2px;"
-                    type="button">Choose Profile Picture</button>
+                <button matButton color="warn" (click)="removeImage()"
+                    style="margin-left: 10px; font-size: 1em; color: red;" type="button">Remove Image</button>
                 }
-            </ng-picker-overlay>
-            @if (imgUrl) {
-            <button matButton color="warn" (click)="removeImage()"
-                style="margin-left: 10px; font-size: 1em; color: red;" type="button">Remove Image</button>
-            }
-        </div>
-        <mat-form-field appearance="fill" class="w-full" style="width: 600px;">
-            <mat-label>Name</mat-label>
-            <input type="text" formControlName="name" matInput required />
-        </mat-form-field><br>
+            </div>
+            <mat-form-field appearance="fill" class="w-full" style="width: 100%;">
+                <mat-label>Name</mat-label>
+                <input type="text" formControlName="name" matInput required />
+            </mat-form-field><br>
 
-        <mat-form-field appearance="fill" class="w-full" style="width: 600px;">
-            <mat-label>Email</mat-label>
-            <input type="email" formControlName="email" matInput required />
-        </mat-form-field><br>
+            <mat-form-field appearance="fill" class="w-full" style="width: 100%;">
+                <mat-label>Email</mat-label>
+                <input type="email" formControlName="email" matInput required />
+            </mat-form-field><br>
 
-        <mat-form-field appearance="fill" class="w-full" style="width: 600px;">
-            <mat-label>Phone Number</mat-label>
-            <input type="text" formControlName="phone" matInput required />
-        </mat-form-field><br>
+            <mat-form-field appearance="fill" class="w-full" style="width: 100%;">
+                <mat-label>Phone Number</mat-label>
+                <input type="text" formControlName="phone" matInput required />
+            </mat-form-field><br>
 
-        <mat-form-field appearance="fill" class="w-full" style="width: 600px;">
-            <mat-label>Password</mat-label>
-            <input [type]="showPassword ? 'text' : 'password'" formControlName="pswd" matInput required />
-            <button matSuffix mat-icon-button aria-label="Toggle password visibility"
-                (click)="togglePasswordVisibility()" type="button" style="margin-right: 8px; margin-top: 4px;">
-                <mat-icon>{{ showPassword ? 'visibility' : 'visibility_off' }}</mat-icon></button>
-        </mat-form-field>
-        <div style="width: 600px; color: red; background-color: #f8d7da; margin: 0 auto;"
-            *ngIf="signUpForm.get('pswd')?.errors?.['hasUpperCase']">
-            Password must contain at least one uppercase letter.
-        </div>
-        <div style="width: 600px; color: red; background-color: #f8d7da; margin: 0 auto;"
-            *ngIf="signUpForm.get('pswd')?.errors?.['hasLowerCase']">
-            Password must contain at least one lowercase letter.
-        </div>
-        <div style="width: 600px; color: red; background-color: #f8d7da; margin: 0 auto;"
-            *ngIf="signUpForm.get('pswd')?.errors?.['hasNumeric']">
-            Password must contain at least one number.
-        </div>
-        <div style="width: 600px; color: red; background-color: #f8d7da; margin: 0 auto;"
-            *ngIf="signUpForm.get('pswd')?.errors?.['hasSpecialChar']">
-            Password must contain at least one special character.
-        </div>
-        <div style="width: 600px; color: red; background-color: #f8d7da; margin: 0 auto;"
-            *ngIf="signUpForm.get('pswd')?.errors?.['isLongEnough']">
-            Password must be at least 8 characters long.
-        </div>
-        <br>
-        <mat-form-field appearance="fill" class="w-full" style="width: 600px;">
-            <mat-label>Confirm Password</mat-label>
-            <input [type]="showPassword ? 'text' : 'password'" formControlName="confirmPswd" matInput required />
-        </mat-form-field>
-        @if (signUpForm.hasError('passwordMismatch') &&
-        signUpForm.get('confirmPswd')?.dirty) {
-        <div style="width: 600px; color: red; background-color: #f8d7da; margin: 0 auto;">
-            Passwords do not match.
-        </div>
-        }<br>
+            <mat-form-field appearance="fill" class="w-full" style="width: 100%;">
+                <mat-label>Password</mat-label>
+                <input [type]="showPassword ? 'text' : 'password'" formControlName="pswd" matInput required />
+                <button matSuffix mat-icon-button aria-label="Toggle password visibility"
+                    (click)="togglePasswordVisibility()" type="button" style="margin-right: 8px; margin-top: 4px;">
+                    <mat-icon>{{ showPassword ? 'visibility' : 'visibility_off' }}</mat-icon></button>
+            </mat-form-field>
+            <div style="width: 100%; color: red; background-color: #f8d7da; margin: 0 auto;"
+                *ngIf="signUpForm.get('pswd')?.errors?.['hasUpperCase']">
+                Password must contain at least one uppercase letter.
+            </div>
+            <div style="width: 100%; color: red; background-color: #f8d7da; margin: 0 auto;"
+                *ngIf="signUpForm.get('pswd')?.errors?.['hasLowerCase']">
+                Password must contain at least one lowercase letter.
+            </div>
+            <div style="width: 100%; color: red; background-color: #f8d7da; margin: 0 auto;"
+                *ngIf="signUpForm.get('pswd')?.errors?.['hasNumeric']">
+                Password must contain at least one number.
+            </div>
+            <div style="width: 100%; color: red; background-color: #f8d7da; margin: 0 auto;"
+                *ngIf="signUpForm.get('pswd')?.errors?.['hasSpecialChar']">
+                Password must contain at least one special character.
+            </div>
+            <div style="width: 100%; color: red; background-color: #f8d7da; margin: 0 auto;"
+                *ngIf="signUpForm.get('pswd')?.errors?.['isLongEnough']">
+                Password must be at least 8 characters long.
+            </div>
+            <br>
+            <mat-form-field appearance="fill" class="w-full" style="width: 100%;">
+                <mat-label>Confirm Password</mat-label>
+                <input [type]="showPassword ? 'text' : 'password'" formControlName="confirmPswd" matInput required />
+            </mat-form-field>
+            @if (signUpForm.hasError('passwordMismatch') &&
+            signUpForm.get('confirmPswd')?.dirty) {
+            <div style="width: 100%; color: red; background-color: #f8d7da; margin: 0 auto;">
+                Passwords do not match.
+            </div>
+            }<br>
 
-        <button mat-raised-button type="submit" [disabled]="signUpForm.invalid" color="primary">Submit</button><br><br>
-        <a mat-button color="accent" style="color: rgb(144, 144, 236)" href="/login">Already have an account? Log In</a>
-    </form>
+            <button mat-raised-button type="submit" [disabled]="signUpForm.invalid"
+                color="primary">Submit</button><br><br>
+            <a mat-button color="accent" style="color: rgb(144, 144, 236)" href="/login">Already have an account? Log
+                In</a>
+        </form>
+    </div>
 </div>

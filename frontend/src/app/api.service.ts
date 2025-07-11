@@ -314,4 +314,9 @@ export class ApiService {
 			this.getAuthHeaders()
 		);
 	}
+
+	createLog(origin: string, type: string, message: string): Observable<any> {
+		const body = { origin, type, message };
+		return this.http.post(`${this.apiUrl}log`, body);
+	}
 }
